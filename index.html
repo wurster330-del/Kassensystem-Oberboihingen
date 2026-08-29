@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Kassensystem">
     
-    <title>Kassensystem - Tagesabschluss mit Detail-Vorschau</title>
+    <title>Kassensystem - Einzelbons pro Artikel für Getränke & Verzehr</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -731,19 +731,38 @@
             margin-bottom: 12px;
         }
 
+        /* Druckbereich für Einzelbons pro Artikel */
+        #print-container {
+            display: none;
+        }
+
         @media print {
             body { background: white; padding: 0; margin: 0; }
-            .no-print, .modal-overlay { display: none !important; }
-            .container { display: block; margin: 0; }
-            .bon-container { box-shadow: none; padding: 0; width: 100%; border: none; position: static; }
-            #bon-bereich { width: 100%; }
+            .no-print, .modal-overlay, .container { display: none !important; }
+            #print-container {
+                display: block !important;
+                width: 100%;
+            }
+            .print-bon-page {
+                page-break-after: always;
+                break-after: page;
+                width: 100%;
+                padding: 10px;
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 13px;
+                color: #000;
+            }
+            .print-bon-page:last-child {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="kasse-panel no-print">
+<div class="container no-print">
+    <div class="kasse-panel">
 
         <div class="bestand-bar">
             <div class="bestand-info">
@@ -835,6 +854,9 @@
         </div>
     </div>
 </div>
+
+<!-- Versteckter Container für den tatsächlichen Druck von Einzelbons -->
+<div id="print-container"></div>
 
 <!-- Modal Dialog: Inhaber-Bereich -->
 <div class="modal-overlay" id="inhaber-modal">
@@ -1552,13 +1574,11 @@
         document.getElementById('v-gewinn').textContent = tagesgewinn.toFixed(2).replace('.', ',') + ' €';
         document.getElementById('v-anzahl').textContent = anzahlVerkaeufe;
         
-        // Helfer-Statistiken in Vorschau
         document.getElementById('v-helfer-anzahl').textContent = helferStatistik.anzahl;
         document.getElementById('v-helfer-wert').textContent = helferStatistik.warenwert.toFixed(2).replace('.', ',') + ' €';
 
         document.getElementById('v-soll').textContent = sollGesamt.toFixed(2).replace('.', ',') + ' €';
 
-        // Artikel-Tabelle
         const artikelTabelle = document.getElementById('v-artikel-tabelle');
         artikelTabelle.innerHTML = `
             <tr>
@@ -1593,7 +1613,6 @@
             });
         }
 
-        // Helfer-Detail-Tabelle
         const helferTabelle = document.getElementById('v-helfer-tabelle');
         helferTabelle.innerHTML = `
             <tr>
@@ -2049,18 +2068,67 @@
             return;
         }
 
-        const bonZahlungBereich = document.getElementById('bon-zahlung-bereich');
-        if (!istHelferAusgabe && gegebenInput >= gesamt) {
-            const rueckgeld = gegebenInput - gesamt;
-            document.getElementById('bon-gegeben').textContent = gegebenInput.toFixed(2).replace('.', ',');
-            document.getElementById('bon-rueckgeld').textContent = rueckgeld.toFixed(2).replace('.', ',');
-            bonZahlungBereich.style.display = 'block';
-        } else {
-            bonZahlungBereich.style.display = 'none';
-        }
-
         const jetzt = new Date();
-        document.getElementById('bon-datum').textContent = jetzt.toLocaleDateString('de-DE') + ' ' + jetzt.toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
+        const datumStr = jetzt.toLocaleDateString('de-DE') + ' ' + jetzt.toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
+
+        const printContainer = document.getElementById('print-container');
+        printContainer.innerHTML = '';
+
+        const nameHTML = document.getElementById('geschaeft-name').innerHTML;
+        const strasse = document.getElementById('geschaeft-strasse').innerText;
+        const ort = document.getElementById('geschaeft-ort').innerText;
+        const tel = document.getElementById('geschaeft-tel').innerText;
+        const fusszeile = document.getElementById('geschaeft-fusszeile').innerText;
+        const logoUrl = document.getElementById('input-logo-url').value.trim();
+
+        // Für jeden einzelnen Artikel im Warenkorb wird ein eigener Bon erstellt
+        warenkorb.forEach((item, index) => {
+            const istGetraenk = (item.kategorie === 'getraenke');
+            const kategorieTitel = istGetraenk ? "AUSGABE: GETRÄNKE" : "AUSGABE: VERZEHR";
+
+            const page = document.createElement('div');
+            page.className = 'print-bon-page';
+
+            let logoHtmlTag = logoUrl ? `<img src="${logoUrl}" style="max-width:100%; max-height:60px; object-fit:contain; margin-bottom:6px; display:block; margin-left:auto; margin-right:auto;" />` : '';
+
+            // Zahlungsangaben optional auf den ersten Bon drucken
+            let zahlungHtml = '';
+            if (index === 0 && !istHelferAusgabe && gegebenInput >= gesamt) {
+                const rueckgeld = gegebenInput - gesamt;
+                zahlungHtml = `
+                    <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
+                    <div style="display: flex; justify-content: space-between;"><span>Gesamtbetrag:</span><span>${gesamt.toFixed(2).replace('.', ',')} €</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>Gegeben:</span><span>${gegebenInput.toFixed(2).replace('.', ',')} €</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>Rückgeld:</span><span>${rueckgeld.toFixed(2).replace('.', ',')} €</span></div>
+                `;
+            }
+
+            page.innerHTML = `
+                <div style="text-align: center;">
+                    ${logoHtmlTag}
+                    <div style="font-size: 16px; font-weight: bold;">${nameHTML}</div>
+                    <div>${strasse}</div>
+                    <div>${ort}</div>
+                    <div>${tel}</div>
+                </div>
+                <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
+                <div style="text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 8px;">--- ${kategorieTitel} ---</div>
+                ${istHelferAusgabe ? `<div style="text-align: center; font-weight: bold; margin-bottom: 8px; background: #ddd; padding: 4px;">HELFER: ${aktuellerHelferName.toUpperCase()}</div>` : ''}
+                
+                <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: bold; margin: 8px 0;">
+                    <span>1x ${item.name}</span>
+                    <span>${item.preis.toFixed(2).replace('.', ',')} €</span>
+                </div>
+
+                ${zahlungHtml}
+                <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
+                <div style="text-align: center;">
+                    <div>${fusszeile}</div>
+                    <div style="margin-top: 6px; font-size: 11px;">${datumStr}</div>
+                </div>
+            `;
+            printContainer.appendChild(page);
+        });
 
         verbucheUmsatz(gesamt, warenkorb);
         window.print();
@@ -2077,6 +2145,7 @@
         document.getElementById('gegeben-geld').value = '';
         document.getElementById('rueckgeld-text').textContent = '0,00';
         document.getElementById('bon-zahlung-bereich').style.display = 'none';
+        document.getElementById('print-container').innerHTML = '';
     }
 </script>
 
