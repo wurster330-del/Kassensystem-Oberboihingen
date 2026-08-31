@@ -425,6 +425,7 @@
             font-size: 13px;
             color: #000;
             background: white;
+            page-break-after: always;
         }
 
         .druck-header-art {
@@ -655,10 +656,31 @@
         }
 
         @media print {
-            body * { visibility: hidden; }
-            #druck-ansicht-overlay, #druck-ansicht-overlay * { visibility: visible; }
-            #druck-ansicht-overlay { display: block !important; position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 0; }
-            .no-print, .modal-overlay { display: none !important; }
+            body * {
+                visibility: hidden !important;
+            }
+            #druck-ansicht-overlay, #druck-ansicht-overlay * {
+                visibility: visible !important;
+            }
+            #druck-ansicht-overlay {
+                display: block !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                background: white !important;
+                z-index: 99999 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .druck-bon-einzel {
+                page-break-after: always;
+                break-after: page;
+            }
+            .no-print, .modal-overlay {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -1099,24 +1121,64 @@
             return;
         }
 
-        const transaktion = {
-            id: Date.now(),
-            zeitpunkt: new Date().toISOString(),
-            artikel: [...warenkorb],
-            gesamt: istHelferAusgabe ? 0 : berechneGesamt(),
-            istHelfer: istHelferAusgabe,
-            helferName: aktuellerHelfer
-        };
+        const overlay = document.getElementById('druck-ansicht-overlay');
+        overlay.innerHTML = '';
 
-        tagesTransaktionen.push(transaktion);
-        letzterGedruckterBon = transaktion;
+        warenkorb.forEach((item, index) => {
+            const transaktion = {
+                id: Date.now() + index,
+                zeitpunkt: new Date().toISOString(),
+                artikel: [item],
+                gesamt: istHelferAusgabe ? 0 : item.preis,
+                istHelfer: istHelferAusgabe,
+                helferName: aktuellerHelfer
+            };
+
+            tagesTransaktionen.push(transaktion);
+            letzterGedruckterBon = transaktion;
+
+            const geschaeftName = document.getElementById('geschaeft-name').innerText;
+            const geschaeftStrasse = document.getElementById('geschaeft-strasse').innerText;
+            const geschaeftOrt = document.getElementById('geschaeft-ort').innerText;
+            const geschaeftTel = document.getElementById('geschaeft-tel').innerText;
+            const geschaeftFuss = document.getElementById('geschaeft-fusszeile').innerText;
+            const datumStr = document.getElementById('bon-datum').innerText;
+
+            const helferTextHtml = istHelferAusgabe ? `<div class="eigenbedarf-banner active" style="margin-bottom:8px;">HELFER-AUSGABE${aktuellerHelfer ? ': ' + aktuellerHelfer : ''}</div>` : '';
+
+            const bonDiv = document.createElement('div');
+            bonDiv.className = 'druck-bon-einzel';
+            bonDiv.innerHTML = `
+                <div class="druck-header-art">EINZELBON (${index + 1}/${warenkorb.length})</div>
+                <div style="text-align:center;">
+                    <strong>${geschaeftName}</strong><br>
+                    ${geschaeftStrasse}<br>
+                    ${geschaeftOrt}<br>
+                    ${geschaeftTel}
+                </div>
+                <div class="trennlinie"></div>
+                ${helferTextHtml}
+                <div style="display:flex; justify-content:space-between; margin:6px 0;">
+                    <span>1x ${item.name}</span>
+                    <span>${istHelferAusgabe ? '0,00 €' : item.preis.toFixed(2) + ' €'}</span>
+                </div>
+                <div class="trennlinie"></div>
+                <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:15px;">
+                    <span>GESAMT:</span>
+                    <span>${istHelferAusgabe ? '0,00 €' : item.preis.toFixed(2) + ' €'}</span>
+                </div>
+                <div class="trennlinie"></div>
+                <div style="text-align:center;">
+                    <div>${geschaeftFuss}</div>
+                    <span style="font-size:11px;">${datumStr}</span>
+                </div>
+            `;
+            overlay.appendChild(bonDiv);
+        });
+
         localStorage.setItem('kasse_tages_transaktionen', JSON.stringify(tagesTransaktionen));
         localStorage.setItem('kasse_letzter_bon', JSON.stringify(letzterGedruckterBon));
 
-        const overlay = document.getElementById('druck-ansicht-overlay');
-        const bonHtml = document.getElementById('bon-bereich').innerHTML;
-        overlay.innerHTML = `<div class="druck-bon-einzel"><div class="druck-header-art">KASSENBON</div>${bonHtml}</div>`;
-        
         window.print();
         storno();
         aktualisiereAnzeige();
