@@ -967,8 +967,19 @@
 <div class="modal-overlay" id="helfer-auswahl-modal">
     <div class="modal-card">
         <h3>🎁 Helfer-Ausgabe auswählen</h3>
-        <p style="font-size: 13px; color: var(--text-muted);">Bitte wählen Sie den Helfer aus, der die kostenlosen Artikel erhält:</p>
+        <p style="font-size: 13px; color: var(--text-muted);">Wählen Sie einen Helfer für die Artikel im Warenkorb oder direkt einen reinen Kategorie-Bon:</p>
+        
+        <div style="background: #f8fafc; border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <label style="margin-top:0; font-size:12px; color:var(--text-muted);">Schnell-Bon ohne Artikelauswahl drucken:</label>
+            <div style="display: flex; gap: 10px; margin-top: 8px;">
+                <button class="btn-action btn-modal-save" style="background-color:#d97706; flex:1;" onclick="druckeDirektKategorieBon('Getränke')">🍺 Nur Getränke</button>
+                <button class="btn-action btn-modal-save" style="background-color:#16a34a; flex:1;" onclick="druckeDirektKategorieBon('Verzehr')">🍔 Nur Verzehr</button>
+            </div>
+        </div>
+
+        <label style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">Oder Helfer für Warenkorb-Artikel zuweisen:</label>
         <div id="helfer-auswahl-grid-container" class="helfer-auswahl-grid"></div>
+
         <div class="modal-actions">
             <button class="btn-modal-cancel" onclick="schliesseHelferAuswahlModal()">Abbrechen</button>
         </div>
@@ -1115,6 +1126,17 @@
         }
     }
 
+    function druckeDirektKategorieBon(kategorieName) {
+        schliesseHelferAuswahlModal();
+        warenkorb = [{ name: kategorieName, preis: 0, kategorie: 'sonstiges', cartId: Date.now() }];
+        istHelferAusgabe = true;
+        aktuellerHelfer = '';
+        document.getElementById('eigenbedarf-banner').innerText = `HELFER-AUSGABE (${kategorieName})`;
+        document.getElementById('eigenbedarf-banner').classList.add('active');
+        aktualisiereWarenkorbAnsicht();
+        bonDrucken();
+    }
+
     function bonDrucken() {
         if (warenkorb.length === 0) {
             alert('Der Warenkorb ist leer!');
@@ -1159,7 +1181,7 @@
                 <div class="trennlinie"></div>
                 ${helferTextHtml}
                 <div style="display:flex; justify-content:space-between; margin:6px 0;">
-                    <span>1x ${item.name}</span>
+                    <span>${item.name === 'Getränke' || item.name === 'Verzehr' ? item.name : '1x ' + item.name}</span>
                     <span>${istHelferAusgabe ? '0,00 €' : item.preis.toFixed(2) + ' €'}</span>
                 </div>
                 <div class="trennlinie"></div>
@@ -1226,14 +1248,15 @@
                 helferBonsAnzahl++;
                 t.artikel.forEach(item => {
                     helferWarenWert += item.preis;
-                    if (!helferStatistik[t.helferName]) {
-                        helferStatistik[t.helferName] = { bons: 0, wert: 0 };
+                    const hName = t.helferName || 'Allgemein / Ohne Name';
+                    if (!helferStatistik[hName]) {
+                        helferStatistik[hName] = { bons: 0, wert: 0 };
                     }
-                    helferStatistik[t.helferName].wert += item.preis;
+                    helferStatistik[hName].wert += item.preis;
+                    if (t.helferName) {
+                        helferStatistik[hName].bons++;
+                    }
                 });
-                if (t.helferName && helferStatistik[t.helferName]) {
-                    helferStatistik[t.helferName].bons++;
-                }
             } else {
                 t.artikel.forEach(item => {
                     if (item.kategorie === 'getraenke') umsatzGetraenke += item.preis;
@@ -1271,7 +1294,7 @@
         }
 
         const helferTabelle = document.getElementById('v-helfer-tabelle');
-        helferTabelle.innerHTML = `<tr><th>Helfer</th><th style="text-align: center;">Anzahl Bons</th><th style="text-align: right;">Warenwert (kostenlos)</th></tr>`;
+        helferTabelle.innerHTML = `<tr><th>Helfer / Art</th><th style="text-align: center;">Anzahl Bons</th><th style="text-align: right;">Warenwert (kostenlos)</th></tr>`;
         for (let [name, data] of Object.entries(helferStatistik)) {
             helferTabelle.innerHTML += `<tr><td>${name}</td><td style="text-align: center;">${data.bons}</td><td style="text-align: right;">${data.wert.toFixed(2)} €</td></tr>`;
         }
@@ -1364,10 +1387,6 @@
     }
 
     function oefneHelferAuswahlModal() {
-        if (warenkorb.length === 0) {
-            alert('Bitte wählen Sie zuerst die Artikel aus, die der Helfer erhalten soll.');
-            return;
-        }
         const container = document.getElementById('helfer-auswahl-grid-container');
         container.innerHTML = '';
         
@@ -1387,6 +1406,10 @@
     }
 
     function waehleHelferAus(name) {
+        if (warenkorb.length === 0) {
+            alert('Bitte wählen Sie zuerst reguläre Artikel aus, wenn Sie einen Helfer zuweisen möchten, oder nutzen Sie oben die Schnell-Buttons "Nur Getränke" / "Nur Verzehr".');
+            return;
+        }
         aktuellerHelfer = name;
         istHelferAusgabe = true;
         document.getElementById('eigenbedarf-banner').innerText = `HELFER-AUSGABE: ${name}`;
