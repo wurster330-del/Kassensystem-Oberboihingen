@@ -83,19 +83,6 @@
             color: var(--text-main);
         }
 
-        .btn-bestand-edit {
-            background: #e2e8f0;
-            color: var(--text-main);
-            border: none;
-            padding: 8px 14px;
-            font-size: 13px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-bestand-edit:hover { background: #cbd5e1; }
-
         /* Produkte Header & Grid */
         .produkte-header {
             display: flex;
@@ -108,23 +95,6 @@
             font-size: 18px;
             font-weight: 700;
             margin: 0;
-        }
-
-        .btn-toggle-delete {
-            background-color: #f1f5f9;
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
-            padding: 8px 14px;
-            font-size: 13px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .btn-toggle-delete.active {
-            background-color: var(--danger);
-            color: white;
-            border-color: var(--danger);
         }
 
         .kategorie-titel {
@@ -223,40 +193,6 @@
             font-size: 11px;
             font-weight: 800;
             text-shadow: 0px 1px 2px rgba(0,0,0,0.8);
-        }
-
-        .btn-delete-item, .btn-edit-item {
-            position: absolute;
-            top: -8px;
-            border: 2px solid white;
-            border-radius: 50%;
-            width: 26px;
-            height: 26px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-            z-index: 10;
-        }
-
-        .btn-delete-item {
-            right: -8px;
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-edit-item {
-            left: -8px;
-            background: var(--warning);
-            color: white;
-        }
-
-        .delete-mode .btn-delete-item,
-        .delete-mode .btn-edit-item {
-            display: flex;
         }
 
         /* Zahlungsbereich */
@@ -478,7 +414,7 @@
         }
         .eigenbedarf-banner.active { display: block; }
 
-        /* Druck-Ansicht Overlay (Fix für iPad Safari) */
+        /* Druck-Ansicht Overlay */
         #druck-ansicht-overlay {
             display: none;
             position: fixed;
@@ -626,6 +562,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            margin-bottom: 16px;
         }
         .inhaber-section h4 { margin-top: 0; margin-bottom: 12px; color: var(--text-main); font-size: 16px; }
 
@@ -763,6 +700,38 @@
             margin-bottom: 12px;
         }
 
+        /* Liste der Produkte im Inhaber-Bereich */
+        .produkt-verwaltungs-tabelle {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin-top: 10px;
+        }
+        .produkt-verwaltungs-tabelle th, .produkt-verwaltungs-tabelle td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+        .produkt-verwaltungs-tabelle th {
+            background-color: #f1f5f9;
+            font-weight: 700;
+        }
+        .btn-tabelle-aktion {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+        }
+        .btn-tabelle-edit { background-color: var(--warning); margin-right: 4px; }
+        .btn-tabelle-del { background-color: var(--danger); }
+
         @media print {
             body * { visibility: hidden; }
             #druck-ansicht-overlay, #druck-ansicht-overlay * { visibility: visible; }
@@ -781,12 +750,10 @@
                 <strong>Soll-Kassenbestand:</strong> <span id="kassenbestand-anzeige">0,00</span> €
                 <br><small style="color:var(--text-muted);">Wechselgeld: <span id="anfangsbestand-anzeige">0,00</span> €</small>
             </div>
-            <button class="btn-bestand-edit" onclick="anfangsbestandAendern()">Wechselgeld anpassen</button>
         </div>
 
         <div class="produkte-header">
             <h2>Produkte</h2>
-            <button class="btn-toggle-delete" id="toggle-delete-btn" onclick="toggleLöschModus()">⚙️ Produkte verwalten</button>
         </div>
 
         <div class="kategorie-titel">🍺 Getränke</div>
@@ -867,7 +834,7 @@
     </div>
 </div>
 
-<!-- Druckansicht Overlay speziell für den iPad-Druckdialog -->
+<!-- Druckansicht Overlay -->
 <div id="druck-ansicht-overlay"></div>
 
 <!-- Modal Dialog: Inhaber-Bereich -->
@@ -877,7 +844,7 @@
             <h3>🔒 Inhaber-Bereich</h3>
             <div class="inhaber-tabs">
                 <button class="tab-btn active" onclick="switchTab('tab-tagesabschluss', event)">📊 Tagesabschluss & Vorschau</button>
-                <button class="tab-btn" onclick="switchTab('tab-produkte', event)">🍕 Produkte</button>
+                <button class="tab-btn" onclick="switchTab('tab-produkte', event)">🍕 Produkte verwalten</button>
                 <button class="tab-btn" onclick="switchTab('tab-helfer', event)">👥 Helfer</button>
                 <button class="tab-btn" onclick="switchTab('tab-einstellungen', event)">⚙️ Einstellungen</button>
             </div>
@@ -886,7 +853,7 @@
         <div class="inhaber-tab-content">
             <!-- TAGESABSCHLUSS MIT ERWEITERTER DETAIL-VORSCHAU -->
             <div id="tab-tagesabschluss" class="tab-pane active">
-                <div class="inhaber-section highlight-card" style="margin-bottom: 16px;">
+                <div class="inhaber-section highlight-card">
                     <h4>📋 Live-Vorschau des Tagesabschlusses</h4>
                     <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Kontrollieren Sie hier alle Einnahmen, Statistiken und Helfer-Ausgaben im Detail.</p>
                     
@@ -967,6 +934,7 @@
                 </div>
             </div>
 
+            <!-- PRODUKTE VERWALTEN (NEUER BEREICH IM INHABER-BEREICH) -->
             <div id="tab-produkte" class="tab-pane">
                 <div class="inhaber-section">
                     <h4>Neues Produkt anlegen</h4>
@@ -1003,8 +971,21 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="inhaber-section" style="background: white;">
+                    <h4>Bestehende Produkte bearbeiten & löschen</h4>
+                    <table class="produkt-verwaltungs-tabelle" id="inhaber-produkt-tabelle">
+                        <tr>
+                            <th>Name</th>
+                            <th>Kategorie</th>
+                            <th>Preis</th>
+                            <th style="text-align: right;">Aktionen</th>
+                        </tr>
+                    </table>
+                </div>
             </div>
 
+            <!-- HELFER -->
             <div id="tab-helfer" class="tab-pane">
                 <div class="inhaber-grid-2col">
                     <div class="inhaber-section">
@@ -1051,7 +1032,14 @@
                 </div>
             </div>
 
+            <!-- EINSTELLUNGEN -->
             <div id="tab-einstellungen" class="tab-pane">
+                <div class="inhaber-section" style="margin-bottom: 16px;">
+                    <h4>💵 Kassenbestand / Wechselgeld</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Legen Sie hier das zu Beginn in der Kasse befindliche Wechselgeld fest.</p>
+                    <button class="btn-bestand-edit" style="width: 100%; padding: 12px; font-size: 14px; background: var(--primary); color: white;" onclick="anfangsbestandAendern()">Wechselgeld anpassen</button>
+                </div>
+
                 <div class="inhaber-section">
                     <h4>Bon-Kopfzeile & Vereins-Logo</h4>
                     <div class="add-product-form-grid">
@@ -1131,7 +1119,6 @@
     const INHABER_PIN = "1234";
 
     let gesamt = 0;
-    let loeschModusAktiv = false;
     let istHelferAusgabe = false;
     let aktuellerHelferName = "";
     let warenkorb = []; 
@@ -1176,6 +1163,8 @@
 
         if (tabId === 'tab-tagesabschluss') {
             aktualisiereTagesabschlussVorschau();
+        } else if (tabId === 'tab-produkte') {
+            renderInhaberProduktTabelle();
         }
     }
 
@@ -1226,26 +1215,45 @@
         
         btn.onclick = function() { addProdukt(name, kategorie, ek, preis); };
 
-        const editBtn = document.createElement('button');
-        editBtn.className = 'btn-edit-item';
-        editBtn.innerHTML = '✏️';
-        editBtn.onclick = function(e) {
-            e.stopPropagation();
-            oefneEditModal(index);
-        };
-
-        const delBtn = document.createElement('button');
-        delBtn.className = 'btn-delete-item';
-        delBtn.innerHTML = '&#10005;';
-        delBtn.onclick = function(e) {
-            e.stopPropagation();
-            loescheProdukt(index);
-        };
-
         wrapper.appendChild(btn);
-        wrapper.appendChild(editBtn);
-        wrapper.appendChild(delBtn);
         targetGrid.appendChild(wrapper);
+    }
+
+    function renderInhaberProduktTabelle() {
+        const tabelle = document.getElementById('inhaber-produkt-tabelle');
+        tabelle.innerHTML = `
+            <tr>
+                <th>Name</th>
+                <th>Kategorie</th>
+                <th>Preis</th>
+                <th style="text-align: right;">Aktionen</th>
+            </tr>
+        `;
+
+        let produkte = JSON.parse(localStorage.getItem('kasse_produkte')) || [];
+        if (produkte.length === 0) {
+            const row = tabelle.insertRow();
+            const cell = row.insertCell(0);
+            cell.colSpan = 4;
+            cell.style.textAlign = 'center';
+            cell.style.color = 'var(--text-muted)';
+            cell.textContent = 'Keine Produkte vorhanden.';
+            return;
+        }
+
+        produkte.forEach((p, index) => {
+            const row = tabelle.insertRow();
+            row.insertCell(0).textContent = p.name;
+            row.insertCell(1).textContent = p.kategorie === 'getraenke' ? 'Getränke' : 'Verzehr';
+            row.insertCell(2).textContent = p.preis.toFixed(2).replace('.', ',') + ' €';
+
+            const aktionenCell = row.insertCell(3);
+            aktionenCell.style.textAlign = 'right';
+            aktionenCell.innerHTML = `
+                <button class="btn-tabelle-aktion btn-tabelle-edit" onclick="oefneEditModal(${index})">Bearbeiten</button>
+                <button class="btn-tabelle-aktion btn-tabelle-del" onclick="loescheProdukt(${index})">Löschen</button>
+            `;
+        });
     }
 
     function speichereGeschaeftsdaten() {
@@ -1845,6 +1853,7 @@
         if (eingabePin === INHABER_PIN) {
             document.getElementById('inhaber-modal').classList.add('active');
             aktualisiereTagesabschlussVorschau();
+            renderInhaberProduktTabelle();
         } else if (eingabePin !== null) {
             alert("Falscher PIN!");
         }
@@ -1959,33 +1968,17 @@
         localStorage.setItem('kasse_produkte', JSON.stringify(produkte));
         schliesseEditModal();
         ladeProdukte();
-    }
-
-    function toggleLöschModus() {
-        loeschModusAktiv = !loeschModusAktiv;
-        const gridG = document.getElementById('grid-getraenke');
-        const gridV = document.getElementById('grid-verzehr');
-        const toggleBtn = document.getElementById('toggle-delete-btn');
-
-        if (loeschModusAktiv) {
-            gridG.classList.add('delete-mode');
-            gridV.classList.add('delete-mode');
-            toggleBtn.textContent = '❌ Beenden';
-            toggleBtn.classList.add('active');
-        } else {
-            gridG.classList.remove('delete-mode');
-            gridV.classList.remove('delete-mode');
-            toggleBtn.textContent = '⚙️ Produkte verwalten';
-            toggleBtn.classList.remove('active');
-        }
+        renderInhaberProduktTabelle();
     }
 
     function loescheProdukt(index) {
-        let produkte = JSON.parse(localStorage.getItem('kasse_produkte')) || [];
-        produkte.splice(index, 1);
-        localStorage.setItem('kasse_produkte', JSON.stringify(produkte));
-        ladeProdukte();
-        if (loeschModusAktiv) toggleLöschModus();
+        if (confirm("Dieses Produkt wirklich löschen?")) {
+            let produkte = JSON.parse(localStorage.getItem('kasse_produkte')) || [];
+            produkte.splice(index, 1);
+            localStorage.setItem('kasse_produkte', JSON.stringify(produkte));
+            ladeProdukte();
+            renderInhaberProduktTabelle();
+        }
     }
 
     function erstelleNeuesProdukt() {
@@ -2009,7 +2002,15 @@
 
         localStorage.setItem('kasse_produkte', JSON.stringify(produkte));
         ladeProdukte();
-        alert('Produkt gespeichert!');
+        renderInhaberProduktTabelle();
+        
+        // Formularfelder leeren
+        document.getElementById('neuer-name').value = '';
+        document.getElementById('neuer-ek').value = '';
+        document.getElementById('neuer-preis').value = '';
+        document.getElementById('neuer-bild-url').value = '';
+        
+        alert('Produkt erfolgreich gespeichert!');
     }
 
     function addProdukt(name, kategorie, ek, preis) {
@@ -2091,7 +2092,6 @@
         const overlay = document.getElementById('druck-ansicht-overlay');
         overlay.innerHTML = '';
 
-        // Für jeden Artikel im Warenkorb einen separaten, eigenen Bon erstellen
         warenkorb.forEach((item, index) => {
             const bonDiv = document.createElement('div');
             bonDiv.className = 'druck-bon-einzel';
@@ -2099,7 +2099,6 @@
             const katTitel = item.kategorie === 'getraenke' ? '🍺 AUSGABE: GETRÄNKE' : '🍔 AUSGABE: VERZEHR';
             
             let zahlungsInfoHTML = '';
-            // Zahlungsinformationen nur beim ersten Bon anzeigen, falls bezahlt wurde
             if (index === 0 && !istHelferAusgabe && gegebenInput >= gesamt) {
                 const rueckgeld = gegebenInput - gesamt;
                 zahlungsInfoHTML = `
@@ -2144,7 +2143,6 @@
 
         verbucheUmsatz(gesamt, warenkorb);
 
-        // Aufruf des Druckdialogs über das Safari-freundliche Overlay
         setTimeout(() => {
             window.print();
             storno();
