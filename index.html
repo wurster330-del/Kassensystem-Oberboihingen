@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Kassensystem">
     
-    <title>Kassensystem - Tagesabschluss mit Detail-Vorschau</title>
+    <title>Kassensystem - Verein der Hundefreunde Oberboihingen e.V.</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -66,7 +66,6 @@
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
         }
 
-        /* Bestand Bar */
         .bestand-bar {
             background: #f8fafc;
             border: 1px solid var(--border-color);
@@ -83,7 +82,6 @@
             color: var(--text-main);
         }
 
-        /* Produkte Header & Grid */
         .produkte-header {
             display: flex;
             justify-content: space-between;
@@ -116,10 +114,6 @@
             gap: 12px;
             margin-bottom: 15px;
             min-height: 40px;
-        }
-
-        .produkt-wrapper {
-            position: relative;
         }
 
         .btn-produkt {
@@ -195,7 +189,6 @@
             text-shadow: 0px 1px 2px rgba(0,0,0,0.8);
         }
 
-        /* Zahlungsbereich */
         .zahlungs-bereich {
             background: #fffbeb;
             border: 1px solid #fef3c7;
@@ -249,18 +242,48 @@
             color: var(--warning);
         }
 
-        /* Action Buttons */
         .storno-gruppe {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-bottom: 14px;
         }
 
-        .storno-zeile-1 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+        .btn-action-flex {
+            width: 100%;
+            padding: 12px 8px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            text-align: center;
+            transition: filter 0.1s, transform 0.1s;
+        }
+
+        .btn-action-flex:hover { filter: brightness(0.96); }
+        .btn-action-flex:active { transform: scale(0.98); }
+
+        .btn-undo {
+            background-color: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+
+        .btn-storno {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-helfer-klein {
+            background-color: #ecfeff;
+            color: #0e7490;
+            border: 1px solid #cffafe;
         }
 
         .btn-action {
@@ -280,36 +303,6 @@
 
         .btn-action:hover { filter: brightness(0.96); }
         .btn-action:active { transform: scale(0.98); }
-
-        .btn-undo {
-            background-color: #fef3c7;
-            color: #b45309;
-            border: 1px solid #fde68a;
-        }
-
-        .btn-storno {
-            background-color: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-
-        .btn-helfer-klein {
-            background-color: #ecfeff;
-            color: #0e7490;
-            border: 1px solid #cffafe;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            border-radius: 10px;
-            cursor: pointer;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: background 0.2s;
-        }
-        .btn-helfer-klein:hover { background-color: #cffafe; }
 
         .btn-drucken {
             background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
@@ -331,7 +324,6 @@
             font-size: 14px;
         }
 
-        /* Bon Container */
         .bon-container {
             width: 320px;
             background: white;
@@ -414,7 +406,6 @@
         }
         .eigenbedarf-banner.active { display: block; }
 
-        /* Druck-Ansicht Overlay */
         #druck-ansicht-overlay {
             display: none;
             position: fixed;
@@ -446,7 +437,6 @@
             border-radius: 4px;
         }
 
-        /* Modals */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -525,7 +515,6 @@
         .btn-modal-save { background-color: var(--success); color: white; }
         .btn-modal-cancel { background-color: #64748b; color: white; }
 
-        /* Inhaber Tabs & Sections */
         .inhaber-header { margin-bottom: 20px; }
         .inhaber-tabs {
             display: flex;
@@ -572,7 +561,7 @@
             gap: 16px;
         }
 
-        .tagesabschluss-vorschau-tabelle {
+        .tagesabschluss-vorschau-tabelle, .produkt-verwaltungs-tabelle {
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
@@ -582,12 +571,13 @@
             border: 1px solid var(--border-color);
             margin-top: 10px;
         }
-        .tagesabschluss-vorschau-tabelle th, .tagesabschluss-vorschau-tabelle td {
+        .tagesabschluss-vorschau-tabelle th, .tagesabschluss-vorschau-tabelle td,
+        .produkt-verwaltungs-tabelle th, .produkt-verwaltungs-tabelle td {
             padding: 10px 12px;
             border-bottom: 1px solid var(--border-color);
             text-align: left;
         }
-        .tagesabschluss-vorschau-tabelle th {
+        .tagesabschluss-vorschau-tabelle th, .produkt-verwaltungs-tabelle th {
             background-color: #f1f5f9;
             color: var(--text-main);
             font-weight: 700;
@@ -608,50 +598,17 @@
         .highlight-card { background: #eff6ff; border-color: #bfdbfe; }
         .danger-card { background: #fef2f2; border-color: #fecaca; }
 
-        .gruppe-block {
-            background: white;
-            border: 1px solid var(--border-color);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        .gruppe-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 700;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 6px;
-            margin-bottom: 8px;
-        }
-
-        .zeit-inputs {
-            display: flex;
-            gap: 8px;
-            align-items: center;
+        .btn-tabelle-aktion {
+            padding: 4px 8px;
             font-size: 12px;
-        }
-
-        .helfer-auswahl-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .btn-helfer-select {
-            background-color: #ecfeff;
-            color: #0e7490;
-            border: 1px solid #cffafe;
-            padding: 10px;
-            font-size: 13px;
-            font-weight: 700;
-            border-radius: 8px;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
-            transition: background 0.2s;
+            font-weight: bold;
+            color: white;
         }
-        .btn-helfer-select:hover { background-color: #cffafe; }
+        .btn-tabelle-edit { background-color: var(--warning); margin-right: 4px; }
+        .btn-tabelle-del { background-color: var(--danger); }
 
         .helfer-liste-item {
             display: flex;
@@ -676,61 +633,26 @@
             font-weight: bold;
         }
 
-        .btn-excel-export {
-            background-color: var(--success);
-            color: white;
-            border: none;
-            padding: 10px 14px;
-            font-size: 13px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .excel-export-box {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-
-        /* Liste der Produkte im Inhaber-Bereich */
-        .produkt-verwaltungs-tabelle {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
+        .helfer-auswahl-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
             margin-top: 10px;
         }
-        .produkt-verwaltungs-tabelle th, .produkt-verwaltungs-tabelle td {
-            padding: 8px 10px;
-            border-bottom: 1px solid var(--border-color);
-            text-align: left;
-        }
-        .produkt-verwaltungs-tabelle th {
-            background-color: #f1f5f9;
-            font-weight: 700;
-        }
-        .btn-tabelle-aktion {
-            padding: 4px 8px;
-            font-size: 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+
+        .btn-helfer-select {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 12px;
             font-weight: bold;
-            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.1s;
         }
-        .btn-tabelle-edit { background-color: var(--warning); margin-right: 4px; }
-        .btn-tabelle-del { background-color: var(--danger); }
+        .btn-helfer-select:hover {
+            background: #e2e8f0;
+        }
 
         @media print {
             body * { visibility: hidden; }
@@ -744,7 +666,6 @@
 
 <div class="container no-print">
     <div class="kasse-panel">
-
         <div class="bestand-bar">
             <div class="bestand-info">
                 <strong>Soll-Kassenbestand:</strong> <span id="kassenbestand-anzeige">0,00</span> €
@@ -780,13 +701,15 @@
         </div>
 
         <div class="storno-gruppe">
-            <div class="storno-zeile-1">
-                <button class="btn-action btn-undo" onclick="entferneLetztenArtikel()">↩ Letzter Artikel</button>
-                <button class="btn-action btn-storno" onclick="storno()">🗑️ Warenkorb leeren</button>
-            </div>
-            <div>
-                <button class="btn-helfer-klein" onclick="oefneHelferAuswahlModal()">🎁 Helfer-Ausgabe (100% Rabatt)</button>
-            </div>
+            <button class="btn-action-flex btn-undo" onclick="entferneLetztenArtikel()">
+                <span>↩</span> <span>Letzter Artikel</span>
+            </button>
+            <button class="btn-action-flex btn-storno" onclick="storno()">
+                <span>🗑️</span> <span>Warenkorb leeren</span>
+            </button>
+            <button class="btn-action-flex btn-helfer-klein" onclick="oefneHelferAuswahlModal()">
+                <span>🎁</span> <span>Helfer-Ausgabe</span>
+            </button>
         </div>
         
         <button class="btn-action btn-drucken" onclick="bonDrucken()">🖨️ Bon Drucken & Abrechnen</button>
@@ -851,7 +774,7 @@
         </div>
 
         <div class="inhaber-tab-content">
-            <!-- TAGESABSCHLUSS MIT ERWEITERTER DETAIL-VORSCHAU -->
+            <!-- TAGESABSCHLUSS -->
             <div id="tab-tagesabschluss" class="tab-pane active">
                 <div class="inhaber-section highlight-card">
                     <h4>📋 Live-Vorschau des Tagesabschlusses</h4>
@@ -934,52 +857,50 @@
                 </div>
             </div>
 
-            <!-- PRODUKTE VERWALTEN (NEUER BEREICH IM INHABER-BEREICH) -->
+            <!-- PRODUKTE VERWALTEN -->
             <div id="tab-produkte" class="tab-pane">
                 <div class="inhaber-section">
-                    <h4>Neues Produkt anlegen</h4>
+                    <h4>Neues Produkt anlegen / Bearbeiten</h4>
+                    <input type="hidden" id="edit-produkt-id" value="">
                     <div class="add-product-form-grid">
-                        <div>
+                        <div class="span-2">
                             <label for="neuer-name">Produktname *</label>
-                            <input type="text" id="neuer-name" placeholder="z. B. Currywurst" required>
+                            <input type="text" id="neuer-name" placeholder="z. B. Currywurst">
+                        </div>
+                        <div>
+                            <label for="neuer-preis">Verkaufspreis (€) *</label>
+                            <input type="number" id="neuer-preis" step="0.01" placeholder="3.50">
+                        </div>
+                        <div>
+                            <label for="neuer-einkaufspreis">Einkaufspreis (€) [optional]</label>
+                            <input type="number" id="neuer-einkaufspreis" step="0.01" placeholder="1.50">
                         </div>
                         <div>
                             <label for="neue-kategorie">Kategorie *</label>
                             <select id="neue-kategorie">
-                                <option value="verzehr">🍔 Verzehr</option>
-                                <option value="getraenke">🍺 Getränke</option>
+                                <option value="getraenke">Getränke</option>
+                                <option value="verzehr">Verzehr</option>
                             </select>
                         </div>
                         <div>
-                            <label for="neuer-ek">Einkaufspreis (€)</label>
-                            <input type="number" id="neuer-ek" step="0.01" min="0" placeholder="0.00">
-                        </div>
-                        <div>
-                            <label for="neuer-preis">Verkaufspreis (€) *</label>
-                            <input type="number" id="neuer-preis" step="0.01" min="0.01" placeholder="0.00" required>
-                        </div>
-                        <div class="span-2">
-                            <label for="neuer-bild-url">Bild-URL (optional)</label>
-                            <input type="text" id="neuer-bild-url" placeholder="https://beispiel.de/bild.png">
-                        </div>
-                        <div>
                             <label for="neue-farbe">Button-Farbe</label>
-                            <input type="color" id="neue-farbe" value="#2563eb" style="width:100%; height:40px; cursor:pointer; border:1px solid var(--border-color); border-radius:8px;">
+                            <input type="color" id="neue-farbe" value="#2563eb" style="width:100%; height:38px; border:1px solid var(--border-color); border-radius:8px; padding:2px;">
                         </div>
-                        <div style="display:flex; align-items:flex-end;">
-                            <button class="btn-add" style="height:40px; background-color:var(--success); color:white; border:none; border-radius:8px; font-weight:bold; width:100%; cursor:pointer;" onclick="erstelleNeuesProdukt()">+ Speichern</button>
-                        </div>
+                    </div>
+                    <div style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button class="btn-action btn-modal-save" onclick="speichereProdukt()">Produkt speichern</button>
+                        <button class="btn-action btn-modal-cancel" onclick="zuruecksetzenProduktFormular()" style="display:none;" id="btn-produkt-abbrechen">Abbrechen</button>
                     </div>
                 </div>
 
                 <div class="inhaber-section" style="background: white;">
-                    <h4>Bestehende Produkte bearbeiten & löschen</h4>
-                    <table class="produkt-verwaltungs-tabelle" id="inhaber-produkt-tabelle">
+                    <h4>Vorhandene Produkte</h4>
+                    <table class="produkt-verwaltungs-tabelle" id="tabelle-produkte-verwaltung">
                         <tr>
-                            <th>Name</th>
-                            <th>Kategorie</th>
+                            <th>Produkt</th>
+                            <th>Kat.</th>
                             <th>Preis</th>
-                            <th style="text-align: right;">Aktionen</th>
+                            <th style="text-align: right;">Aktion</th>
                         </tr>
                     </table>
                 </div>
@@ -987,838 +908,415 @@
 
             <!-- HELFER -->
             <div id="tab-helfer" class="tab-pane">
-                <div class="inhaber-grid-2col">
-                    <div class="inhaber-section">
-                        <h4>Arbeitsgruppe & Helfer anlegen</h4>
-                        <div style="background: white; border:1px solid var(--border-color); padding:12px; border-radius:8px; margin-bottom:12px;">
-                            <label>Neue Arbeitsgruppe:</label>
-                            <input type="text" id="neue-gruppe-name" placeholder="Name (z.B. Küche)">
-                            <div style="display: flex; gap: 8px; align-items: center; margin-top:8px;">
-                                <span style="font-size: 12px;">Von:</span>
-                                <input type="time" id="neue-gruppe-von" value="08:00">
-                                <span style="font-size: 12px;">Bis:</span>
-                                <input type="time" id="neue-gruppe-bis" value="16:00">
-                            </div>
-                            <button class="btn-add" style="margin-top:8px; width:100%; background:var(--primary); color:white; border:none; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="erstelleNeueArbeitsgruppe()">+ Gruppe erstellen</button>
-                        </div>
-
-                        <div style="background: white; border:1px solid var(--border-color); padding:12px; border-radius:8px;">
-                            <label>Helfer zuweisen:</label>
-                            <input type="text" id="neuer-helfer-name" placeholder="Name des Helfers">
-                            <select id="helfer-gruppe-select" style="margin-top:8px;"></select>
-                            <button class="btn-add" style="margin-top:8px; width:100%; background:var(--primary); color:white; border:none; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="erstelleNeuenHelfer()">+ Helfer hinzufügen</button>
-                        </div>
+                <div class="inhaber-section">
+                    <h4>Helfer verwalten</h4>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="neuer-helfer-name" placeholder="Name des Helfers...">
+                        <button class="btn-action btn-modal-save" style="width: auto; padding: 10px 20px;" onclick="fuegeHelferHinzu()">Hinzufügen</button>
                     </div>
-
-                    <div class="inhaber-section">
-                        <div class="excel-export-box">
-                            <label style="margin-top:0; margin-bottom:4px; color:var(--success);">📁 Excel-Helferliste hochladen:</label>
-                            <input type="file" id="excel-import-file" accept=".xlsx, .xls" style="display: none;" onchange="importiereHelferListeExcel(event)">
-                            <button class="btn-excel-export" style="background-color: var(--primary);" onclick="document.getElementById('excel-import-file').click()">
-                                📂 Datei auswählen
-                            </button>
-                            <div id="import-helfer-info" style="margin-top: 6px; font-size: 11px; color: var(--text-muted);"></div>
-                        </div>
-
-                        <div style="background: white; border:1px solid var(--border-color); padding:12px; border-radius:8px; margin-bottom: 12px;">
-                            <label for="helfer-export-datum" style="margin-top:0; margin-bottom:4px;">Datum für Excel-Export:</label>
-                            <input type="date" id="helfer-export-datum" style="margin-bottom:8px;">
-                            <button class="btn-excel-export" onclick="exportiereHelferListeExcel()">📊 Helferliste exportieren</button>
-                        </div>
-
-                        <h4 style="margin-top: 8px; margin-bottom: 6px;">Bestehende Gruppen</h4>
-                        <div id="gruppen-container" style="max-height: 220px; overflow-y: auto;"></div>
-                    </div>
+                    <div id="helfer-liste-container"></div>
                 </div>
             </div>
 
             <!-- EINSTELLUNGEN -->
             <div id="tab-einstellungen" class="tab-pane">
-                <div class="inhaber-section" style="margin-bottom: 16px;">
-                    <h4>💵 Kassenbestand / Wechselgeld</h4>
-                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Legen Sie hier das zu Beginn in der Kasse befindliche Wechselgeld fest.</p>
-                    <button class="btn-bestand-edit" style="width: 100%; padding: 12px; font-size: 14px; background: var(--primary); color: white;" onclick="anfangsbestandAendern()">Wechselgeld anpassen</button>
-                </div>
-
                 <div class="inhaber-section">
-                    <h4>Bon-Kopfzeile & Vereins-Logo</h4>
-                    <div class="add-product-form-grid">
-                        <div class="span-2">
-                            <label for="input-logo-url">Logo-Bild-URL (optional):</label>
-                            <input type="text" id="input-logo-url" placeholder="https://beispiel.de/logo.png" onchange="updateHeaderEinstellungen()">
-                        </div>
-                        <div>
-                            <label for="input-titel-groesse">Schriftgröße Name (px):</label>
-                            <input type="number" id="input-titel-groesse" value="16" min="10" max="40" onchange="updateHeaderEinstellungen()">
-                        </div>
+                    <h4>Allgemeine Einstellungen & Wechselgeld</h4>
+                    <label for="input-wechselgeld">Start-Wechselgeld in der Kasse (€):</label>
+                    <input type="number" id="input-wechselgeld" step="0.01" onchange="speichereWechselgeld(this.value)">
+
+                    <label for="input-passwort" style="margin-top: 15px;">Inhaber-Passwort (aktuell ungesichert / frei):</label>
+                    <input type="text" id="input-passwort" placeholder="Leer lassen für keinen Schutz">
+                    
+                    <div style="margin-top: 20px;">
+                        <button class="btn-action btn-modal-save" onclick="schliesseInhaberBereich()">Einstellungen übernehmen</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="modal-actions">
-            <button class="btn-modal-cancel" onclick="schliesseInhaberModal()">Schließen</button>
+        <div class="modal-actions" style="border-top: 2px solid var(--border-color); padding-top: 15px; margin-top: 20px;">
+            <button class="btn-modal-cancel" onclick="schliesseInhaberBereich()">Schließen</button>
         </div>
     </div>
 </div>
 
-<!-- Modal Dialog: Helfer Auswählen -->
+<!-- Modal: Helfer-Auswahl -->
 <div class="modal-overlay" id="helfer-auswahl-modal">
     <div class="modal-card">
-        <h3>🎁 Helfer auswählen</h3>
-        <p style="font-size: 13px; color: var(--text-muted);">Wähle einen Helfer aus einer Arbeitsgruppe:</p>
-        
-        <div id="helfer-auswahl-gruppen-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 16px;"></div>
-
-        <div style="border-top: 1px solid var(--border-color); padding-top: 12px;">
-            <input type="text" id="manuell-helfer-input" placeholder="Oder Name manuell eingeben..." style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px;">
-            <button class="btn-add" style="width:100%; background:var(--primary); color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="waehleHelferManuell()">Manuell Auswählen</button>
-        </div>
-
+        <h3>🎁 Helfer-Ausgabe auswählen</h3>
+        <p style="font-size: 13px; color: var(--text-muted);">Bitte wählen Sie den Helfer aus, der die kostenlosen Artikel erhält:</p>
+        <div id="helfer-auswahl-grid-container" class="helfer-auswahl-grid"></div>
         <div class="modal-actions">
             <button class="btn-modal-cancel" onclick="schliesseHelferAuswahlModal()">Abbrechen</button>
         </div>
     </div>
 </div>
 
-<!-- Modal Dialog zum Bearbeiten eines Produkts -->
-<div class="modal-overlay" id="edit-modal">
-    <div class="modal-card">
-        <h3>Produkt bearbeiten</h3>
-        <input type="hidden" id="edit-index">
-        
-        <label for="edit-name">Produktname:</label>
-        <input type="text" id="edit-name">
-
-        <label for="edit-kategorie">Kategorie:</label>
-        <select id="edit-kategorie">
-            <option value="verzehr">Verzehr</option>
-            <option value="getraenke">Getränke</option>
-        </select>
-
-        <label for="edit-ek">Einkaufspreis (€):</label>
-        <input type="number" id="edit-ek" step="0.01">
-
-        <label for="edit-preis">Verkaufspreis (€):</label>
-        <input type="number" id="edit-preis" step="0.01">
-
-        <label for="edit-bild-url">Bild-URL:</label>
-        <input type="text" id="edit-bild-url">
-
-        <label for="edit-farbe">Farbe:</label>
-        <input type="color" id="edit-farbe" style="width: 100%; height: 40px; cursor: pointer; border-radius: 8px; border: 1px solid var(--border-color);">
-
-        <div class="modal-actions">
-            <button class="btn-modal-cancel" onclick="schliesseEditModal()">Abbrechen</button>
-            <button class="btn-modal-save" onclick="speichereProduktAenderung()">Speichern</button>
-        </div>
-    </div>
-</div>
-
 <script>
-    const INHABER_PIN = "1234";
-
-    let gesamt = 0;
-    let istHelferAusgabe = false;
-    let aktuellerHelferName = "";
-    let warenkorb = []; 
-    let tagesumsatz = 0.00;
-    let umsatzGetraenke = 0.00;
-    let umsatzVerzehr = 0.00;
-    let tagesgewinn = 0.00;
-    let anzahlVerkaeufe = 0;
-    let anfangsbestand = 0.00;
-    let verkaeufeStatistik = {};
-    let helferStatistik = { anzahl: 0, warenwert: 0.00, helfer: {} };
-    let letzterBon = null;
-    let arbeitsgruppen = [];
-
-    const standardProdukte = [
-        { name: 'Wurst', kategorie: 'verzehr', ek: 1.00, preis: 3.50, farbe: '#dc2626', bildUrl: '' },
-        { name: 'Steak', kategorie: 'verzehr', ek: 4.50, preis: 12.00, farbe: '#991b1b', bildUrl: '' },
-        { name: 'Pils Bier', kategorie: 'getraenke', ek: 0.80, preis: 3.00, farbe: '#d97706', bildUrl: '' },
-        { name: 'Weizenbier', kategorie: 'getraenke', ek: 0.90, preis: 3.80, farbe: '#b45309', bildUrl: '' }
+    let produkte = JSON.parse(localStorage.getItem('kasse_produkte')) || [
+        { id: 1, name: 'Bier 0,5l', preis: 3.50, einkauf: 1.80, kategorie: 'getraenke', farbe: '#b45309' },
+        { id: 2, name: 'Radler 0,5l', preis: 3.50, einkauf: 1.80, kategorie: 'getraenke', farbe: '#d97706' },
+        { id: 3, name: 'Wasser 0,5l', preis: 2.00, einkauf: 0.80, kategorie: 'getraenke', farbe: '#2563eb' },
+        { id: 4, name: 'Cola / Limo', preis: 2.50, einkauf: 1.00, kategorie: 'getraenke', farbe: '#dc2626' },
+        { id: 5, name: 'Wurstsalat', preis: 6.50, einkauf: 3.20, kategorie: 'verzehr', farbe: '#16a34a' },
+        { id: 6, name: 'Currywurst', preis: 4.50, einkauf: 2.10, kategorie: 'verzehr', farbe: '#ca8a04' },
+        { id: 7, name: 'Pommes frites', preis: 3.00, einkauf: 1.10, kategorie: 'verzehr', farbe: '#9333ea' }
     ];
 
-    document.addEventListener("DOMContentLoaded", function() {
-        ladeProdukte();
-        ladeTagesdaten();
-        ladeGeschaeftsdaten();
-        ladeArbeitsgruppen();
-        aktualisiereKassenbestandAnzeige();
-        zeigeImportierteHelferInfo();
-        
-        const heute = new Date().toISOString().split('T')[0];
-        document.getElementById('helfer-export-datum').value = heute;
+    let helferListe = JSON.parse(localStorage.getItem('kasse_helfer')) || ['Max Mustermann', 'Erika Musterfrau', 'Hans Dampf'];
+    let anfangsbestand = parseFloat(localStorage.getItem('kasse_anfangsbestand')) || 100.00;
+    
+    let warenkorb = [];
+    let tagesTransaktionen = JSON.parse(localStorage.getItem('kasse_tages_transaktionen')) || [];
+    let letzterGedruckterBon = JSON.parse(localStorage.getItem('kasse_letzter_bon')) || null;
+    let istHelferAusgabe = false;
+    let aktuellerHelfer = '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        aktualisiereDatum();
+        renderProdukte();
+        aktualisiereAnzeige();
+        document.getElementById('input-wechselgeld').value = anfangsbestand.toFixed(2);
+        setInterval(aktualisiereDatum, 1000);
     });
 
-    function switchTab(tabId, evt) {
-        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-
-        document.getElementById(tabId).classList.add('active');
-        if (evt && evt.currentTarget) {
-            evt.currentTarget.classList.add('active');
-        }
-
-        if (tabId === 'tab-tagesabschluss') {
-            aktualisiereTagesabschlussVorschau();
-        } else if (tabId === 'tab-produkte') {
-            renderInhaberProduktTabelle();
-        }
+    function aktualisiereDatum() {
+        const jetzt = new Date();
+        document.getElementById('bon-datum').innerText = jetzt.toLocaleDateString('de-DE') + ' ' + jetzt.toLocaleTimeString('de-DE');
     }
 
-    function ladeProdukte() {
+    function renderProdukte() {
         const gridGetraenke = document.getElementById('grid-getraenke');
         const gridVerzehr = document.getElementById('grid-verzehr');
         gridGetraenke.innerHTML = '';
         gridVerzehr.innerHTML = '';
 
-        let produkte = null;
-        try {
-            produkte = JSON.parse(localStorage.getItem('kasse_produkte'));
-        } catch(e) {
-            produkte = null;
-        }
+        produkte.forEach(p => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'produkt-wrapper';
+            
+            const btn = document.createElement('button');
+            btn.className = 'btn-produkt';
+            btn.style.backgroundColor = p.farbe || '#2563eb';
+            btn.onclick = () => fuegeZumWarenkorbHinzu(p);
 
-        if (!produkte || !Array.isArray(produkte) || produkte.length === 0) {
-            produkte = standardProdukte;
-            localStorage.setItem('kasse_produkte', JSON.stringify(produkte));
-        }
-
-        produkte.forEach((p, index) => {
-            renderProduktButton(p.name, p.kategorie || 'verzehr', p.ek || 0, p.preis, p.farbe || '#2563eb', p.bildUrl || '', index);
-        });
-    }
-
-    function renderProduktButton(name, kategorie, ek, preis, farbe, bildUrl, index) {
-        const targetGrid = kategorie === 'getraenke' 
-            ? document.getElementById('grid-getraenke') 
-            : document.getElementById('grid-verzehr');
-
-        const wrapper = document.createElement('div');
-        wrapper.className = 'produkt-wrapper';
-
-        const btn = document.createElement('button');
-        btn.className = 'btn-produkt';
-        btn.style.backgroundColor = farbe;
-        if (bildUrl) {
-            btn.style.backgroundImage = `url('${bildUrl}')`;
-        }
-        
-        btn.innerHTML = `
-            <div class="btn-produkt-content">
-                <div class="produkt-title">${name}</div>
-                <div class="produkt-preis-badge">${preis.toFixed(2).replace('.', ',')} €</div>
-            </div>
-        `;
-        
-        btn.onclick = function() { addProdukt(name, kategorie, ek, preis); };
-
-        wrapper.appendChild(btn);
-        targetGrid.appendChild(wrapper);
-    }
-
-    function renderInhaberProduktTabelle() {
-        const tabelle = document.getElementById('inhaber-produkt-tabelle');
-        tabelle.innerHTML = `
-            <tr>
-                <th>Name</th>
-                <th>Kategorie</th>
-                <th>Preis</th>
-                <th style="text-align: right;">Aktionen</th>
-            </tr>
-        `;
-
-        let produkte = JSON.parse(localStorage.getItem('kasse_produkte')) || [];
-        if (produkte.length === 0) {
-            const row = tabelle.insertRow();
-            const cell = row.insertCell(0);
-            cell.colSpan = 4;
-            cell.style.textAlign = 'center';
-            cell.style.color = 'var(--text-muted)';
-            cell.textContent = 'Keine Produkte vorhanden.';
-            return;
-        }
-
-        produkte.forEach((p, index) => {
-            const row = tabelle.insertRow();
-            row.insertCell(0).textContent = p.name;
-            row.insertCell(1).textContent = p.kategorie === 'getraenke' ? 'Getränke' : 'Verzehr';
-            row.insertCell(2).textContent = p.preis.toFixed(2).replace('.', ',') + ' €';
-
-            const aktionenCell = row.insertCell(3);
-            aktionenCell.style.textAlign = 'right';
-            aktionenCell.innerHTML = `
-                <button class="btn-tabelle-aktion btn-tabelle-edit" onclick="oefneEditModal(${index})">Bearbeiten</button>
-                <button class="btn-tabelle-aktion btn-tabelle-del" onclick="loescheProdukt(${index})">Löschen</button>
+            btn.innerHTML = `
+                <div class="btn-produkt-content">
+                    <span class="produkt-title">${p.name}</span>
+                    <span class="produkt-preis-badge">${p.preis.toFixed(2)} €</span>
+                </div>
             `;
+            wrapper.appendChild(btn);
+
+            if (p.kategorie === 'getraenke') {
+                gridGetraenke.appendChild(wrapper);
+            } else {
+                gridVerzehr.appendChild(wrapper);
+            }
         });
+        renderProdukteVerwaltungTabelle();
     }
 
-    function speichereGeschaeftsdaten() {
-        const logoUrl = document.getElementById('input-logo-url').value.trim();
-        const titelGroesse = document.getElementById('input-titel-groesse').value;
-
-        const daten = {
-            name: document.getElementById('geschaeft-name').innerHTML,
-            strasse: document.getElementById('geschaeft-strasse').innerText,
-            ort: document.getElementById('geschaeft-ort').innerText,
-            tel: document.getElementById('geschaeft-tel').innerText,
-            fusszeile: document.getElementById('geschaeft-fusszeile').innerText,
-            logoUrl: logoUrl,
-            titelGroesse: titelGroesse
-        };
-        localStorage.setItem('kasse_geschaeftsdaten', JSON.stringify(daten));
+    function fuegeZumWarenkorbHinzu(produkt) {
+        warenkorb.push({ ...produkt, cartId: Date.now() + Math.random() });
+        aktualisiereWarenkorbAnsicht();
     }
 
-    function ladeGeschaeftsdaten() {
-        const daten = JSON.parse(localStorage.getItem('kasse_geschaeftsdaten'));
-        if (daten) {
-            if (daten.name) document.getElementById('geschaeft-name').innerHTML = daten.name;
-            if (daten.strasse) document.getElementById('geschaeft-strasse').innerText = daten.strasse;
-            if (daten.ort) document.getElementById('geschaeft-ort').innerText = daten.ort;
-            if (daten.tel) document.getElementById('geschaeft-tel').innerText = daten.tel;
-            if (daten.fusszeile) document.getElementById('geschaeft-fusszeile').innerText = daten.fusszeile;
-            if (daten.logoUrl !== undefined) document.getElementById('input-logo-url').value = daten.logoUrl;
-            if (daten.titelGroesse) document.getElementById('input-titel-groesse').value = daten.titelGroesse;
-        } else {
-            document.getElementById('geschaeft-name').innerHTML = '<strong>Verein der Hundefreunde Oberboihingen e.V.</strong>';
-            document.getElementById('geschaeft-ort').innerText = '72644 Oberboihingen';
+    function entferneArtikelAusWarenkorb(cartId) {
+        const index = warenkorb.findIndex(item => item.cartId === cartId);
+        if (index > -1) {
+            warenkorb.splice(index, 1);
+            aktualisiereWarenkorbAnsicht();
         }
-        applyHeaderSettings();
     }
 
-    function updateHeaderEinstellungen() {
-        applyHeaderSettings();
-        speichereGeschaeftsdaten();
-    }
-
-    function applyHeaderSettings() {
-        const logoUrl = document.getElementById('input-logo-url').value.trim();
-        const titelGroesse = document.getElementById('input-titel-groesse').value || 16;
-        
-        const logoImg = document.getElementById('bon-logo-img');
-        if (logoUrl) {
-            logoImg.src = logoUrl;
-            logoImg.style.display = 'block';
-        } else {
-            logoImg.style.display = 'none';
+    function entferneLetztenArtikel() {
+        if (warenkorb.length > 0) {
+            warenkorb.pop();
+            aktualisiereWarenkorbAnsicht();
         }
-
-        const gName = document.getElementById('geschaeft-name');
-        gName.style.fontSize = titelGroesse + 'px';
     }
 
-    function ladeArbeitsgruppen() {
-        const daten = localStorage.getItem('kasse_arbeitsgruppen');
-        if (daten) {
-            arbeitsgruppen = JSON.parse(daten);
+    function storno() {
+        warenkorb = [];
+        istHelferAusgabe = false;
+        aktuellerHelfer = '';
+        document.getElementById('eigenbedarf-banner').classList.remove('active');
+        document.getElementById('gegeben-geld').value = '';
+        aktualisiereWarenkorbAnsicht();
+    }
+
+    function berechneGesamt() {
+        if (istHelferAusgabe) return 0;
+        return warenkorb.reduce((sum, item) => sum + item.preis, 0);
+    }
+
+    function aktualisiereWarenkorbAnsicht() {
+        const bonArtikelContainer = document.getElementById('bon-artikel');
+        bonArtikelContainer.innerHTML = '';
+
+        warenkorb.forEach((item) => {
+            const zeile = document.createElement('div');
+            zeile.className = 'bon-zeile item-row';
+            zeile.title = 'Klicken zum Entfernen';
+            zeile.onclick = () => entferneArtikelAusWarenkorb(item.cartId);
+            
+            const preisAnzeige = istHelferAusgabe ? '0,00 €' : `${item.preis.toFixed(2)} €`;
+            zeile.innerHTML = `<span>1x ${item.name}</span><span>${preisAnzeige}</span>`;
+            bonArtikelContainer.appendChild(zeile);
+        });
+
+        const gesamt = berechneGesamt();
+        document.getElementById('summe').innerText = gesamt.toFixed(2);
+        berechneRueckgeld();
+    }
+
+    function setGegeben(betrag) {
+        document.getElementById('gegeben-geld').value = betrag.toFixed(2);
+        berechneRueckgeld();
+    }
+
+    function berechneRueckgeld() {
+        const gesamt = berechneGesamt();
+        const gegebenInput = parseFloat(document.getElementById('gegeben-geld').value) || 0;
+        const rueckgeld = gegebenInput - gesamt;
+
+        if (gegebenInput > 0 && !istHelferAusgabe) {
+            document.getElementById('bon-zahlung-bereich').style.display = 'block';
+            document.getElementById('bon-gegeben').innerText = gegebenInput.toFixed(2);
+            document.getElementById('bon-rueckgeld').innerText = (rueckgeld >= 0 ? rueckgeld : 0).toFixed(2);
+            document.getElementById('rueckgeld-text').innerText = (rueckgeld >= 0 ? rueckgeld : 0).toFixed(2);
         } else {
-            arbeitsgruppen = [
-                { id: 1, name: "Schicht Früh (Küche)", von: "08:00", bis: "14:00", helfer: ["Max", "Anna"] },
-                { id: 2, name: "Schicht Spät (Ausschank)", von: "14:00", bis: "22:00", helfer: ["Lukas", "Julia"] }
-            ];
-            speichereArbeitsgruppen();
+            document.getElementById('bon-zahlung-bereich').style.display = 'none';
+            document.getElementById('rueckgeld-text').innerText = '0,00';
         }
-        renderArbeitsgruppenUI();
     }
 
-    function speichereArbeitsgruppen() {
-        localStorage.setItem('kasse_arbeitsgruppen', JSON.stringify(arbeitsgruppen));
-        renderArbeitsgruppenUI();
-    }
-
-    function erstelleNeueArbeitsgruppe() {
-        const nameInput = document.getElementById('neue-gruppe-name');
-        const vonInput = document.getElementById('neue-gruppe-von');
-        const bisInput = document.getElementById('neue-gruppe-bis');
-
-        const name = nameInput.value.trim();
-        if (!name) {
-            alert("Bitte einen Gruppen-Namen eingeben!");
+    function bonDrucken() {
+        if (warenkorb.length === 0) {
+            alert('Der Warenkorb ist leer!');
             return;
         }
 
-        const neueGruppe = {
+        const transaktion = {
             id: Date.now(),
-            name: name,
-            von: vonInput.value || "00:00",
-            bis: bisInput.value || "23:59",
-            helfer: []
+            zeitpunkt: new Date().toISOString(),
+            artikel: [...warenkorb],
+            gesamt: istHelferAusgabe ? 0 : berechneGesamt(),
+            istHelfer: istHelferAusgabe,
+            helferName: aktuellerHelfer
         };
 
-        arbeitsgruppen.push(neueGruppe);
-        speichereArbeitsgruppen();
-        nameInput.value = '';
+        tagesTransaktionen.push(transaktion);
+        letzterGedruckterBon = transaktion;
+        localStorage.setItem('kasse_tages_transaktionen', JSON.stringify(tagesTransaktionen));
+        localStorage.setItem('kasse_letzter_bon', JSON.stringify(letzterGedruckterBon));
+
+        const overlay = document.getElementById('druck-ansicht-overlay');
+        const bonHtml = document.getElementById('bon-bereich').innerHTML;
+        overlay.innerHTML = `<div class="druck-bon-einzel"><div class="druck-header-art">KASSENBON</div>${bonHtml}</div>`;
+        
+        window.print();
+        storno();
+        aktualisiereAnzeige();
     }
 
-    function loescheGruppe(gruppeId) {
-        if (confirm("Arbeitsgruppe samt enthaltenen Helfern wirklich löschen?")) {
-            arbeitsgruppen = arbeitsgruppen.filter(g => g.id !== gruppeId);
-            speichereArbeitsgruppen();
-        }
-    }
-
-    function updateGruppeZeit(gruppeId, typ, me) {
-        const g = arbeitsgruppen.find(item => item.id === gruppeId);
-        if (g) {
-            if (typ === 'von') g.von = me.value;
-            if (typ === 'bis') g.bis = me.value;
-            localStorage.setItem('kasse_arbeitsgruppen', JSON.stringify(arbeitsgruppen));
-        }
-    }
-
-    function erstelleNeuenHelfer() {
-        const nameInput = document.getElementById('neuer-helfer-name');
-        const gruppeSelect = document.getElementById('helfer-gruppe-select');
-
-        const name = nameInput.value.trim();
-        const gruppeId = parseInt(gruppeSelect.value, 10);
-
-        if (!name) {
-            alert("Bitte Helfer-Namen eingeben!");
-            return;
-        }
-
-        const gruppe = arbeitsgruppen.find(g => g.id === gruppeId);
-        if (gruppe) {
-            if (!gruppe.helfer.includes(name)) {
-                gruppe.helfer.push(name);
-                speichereArbeitsgruppen();
-                nameInput.value = '';
-            } else {
-                alert("Helfer existiert bereits in dieser Gruppe!");
-            }
-        } else {
-            alert("Bitte erst eine Arbeitsgruppe auswählen!");
-        }
-    }
-
-    function loescheHelfer(gruppeId, helferIndex) {
-        const g = arbeitsgruppen.find(item => item.id === gruppeId);
-        if (g) {
-            g.helfer.splice(helferIndex, 1);
-            speichereArbeitsgruppen();
-        }
-    }
-
-    function importiereHelferListeExcel(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonDaten = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-                if (jsonDaten.length === 0) {
-                    alert("Die Datei scheint leer zu sein!");
-                    return;
-                }
-
-                const importObj = {
-                    dateiname: file.name,
-                    datum: new Date().toLocaleString('de-DE'),
-                    zeilen: jsonDaten
-                };
-
-                localStorage.setItem('kasse_importierte_helferliste', JSON.stringify(importObj));
-                verarbeiteImportierteHelfer(jsonDaten);
-                zeigeImportierteHelferInfo();
-                alert(`Excel-Datei "${file.name}" erfolgreich importiert!`);
-            } catch (err) {
-                console.error(err);
-                alert("Fehler beim Lesen der Excel-Datei.");
-            }
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
-    function verarbeiteImportierteHelfer(zeilen) {
-        zeilen.forEach((zeile, index) => {
-            if (index < 1 || !zeile || zeile.length === 0) return;
-            const gruppeName = zeile[1] ? String(zeile[1]).trim() : "Importierte Gruppe";
-            const helferName = zeile[4] ? String(zeile[4]).trim() : (zeile[0] ? String(zeile[0]).trim() : null);
-
-            if (helferName && helferName !== "(Keine Helfer zugewiesen)" && !helferName.includes("HELFER")) {
-                let gruppe = arbeitsgruppen.find(g => g.name.toLowerCase() === gruppeName.toLowerCase());
-                if (!gruppe) {
-                    gruppe = {
-                        id: Date.now() + Math.floor(Math.random() * 1000),
-                        name: gruppeName,
-                        von: zeile[2] || "08:00",
-                        bis: zeile[3] || "16:00",
-                        helfer: []
-                    };
-                    arbeitsgruppen.push(gruppe);
-                }
-                if (!gruppe.helfer.includes(helferName)) {
-                    gruppe.helfer.push(helferName);
-                }
-            }
+    function aktualisiereAnzeige() {
+        let umsatzGesamt = 0;
+        tagesTransaktionen.forEach(t => {
+            if (!t.istHelfer) umsatzGesamt += t.gesamt;
         });
-        speichereArbeitsgruppen();
+        const sollKasse = anfangsbestand + umsatzGesamt;
+        document.getElementById('kassenbestand-anzeige').innerText = sollKasse.toFixed(2);
+        document.getElementById('anfangsbestand-anzeige').innerText = anfangsbestand.toFixed(2);
     }
 
-    function zeigeImportierteHelferInfo() {
-        const infoContainer = document.getElementById('import-helfer-info');
-        if (!infoContainer) return;
-        const saved = localStorage.getItem('kasse_importierte_helferliste');
-        if (saved) {
-            const importObj = JSON.parse(saved);
-            infoContainer.innerHTML = `<strong>Aktiv:</strong> ${importObj.dateiname}`;
-        } else {
-            infoContainer.innerHTML = `Keine Datei hinterlegt.`;
-        }
+    function oefneInhaberBereich() {
+        aktualisiereTagesabschlussVorschau();
+        document.getElementById('inhaber-modal').classList.add('active');
     }
 
-    function exportiereHelferListeExcel() {
-        if (!arbeitsgruppen || arbeitsgruppen.length === 0) {
-            alert("Keine Arbeitsgruppen vorhanden!");
-            return;
-        }
-
-        const gewaehltesDatumInput = document.getElementById('helfer-export-datum').value;
-        let formatiertesDatum = gewaehltesDatumInput ? gewaehltesDatumInput.split('-').reverse().join('.') : new Date().toLocaleDateString('de-DE');
-
-        let data = [
-            ["HELFER- UND ARBEITSGRUPPENÜBERSICHT"],
-            ["Einsatzdatum:", formatiertesDatum],
-            [""],
-            ["Datum", "Arbeitsgruppe", "Zeitraum Von", "Zeitraum Bis", "Helfer Name"]
-        ];
-
-        arbeitsgruppen.forEach(g => {
-            if (g.helfer.length === 0) {
-                data.push([formatiertesDatum, g.name, g.von, g.bis, "(Keine Helfer zugewiesen)"]);
-            } else {
-                g.helfer.forEach(hName => {
-                    data.push([formatiertesDatum, g.name, g.von, g.bis, hName]);
-                });
-            }
-        });
-
-        let ws = XLSX.utils.aoa_to_sheet(data);
-        let wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Helferliste");
-        XLSX.writeFile(wb, `Helferliste_${formatiertesDatum.replace(/\./g, '-')}.xlsx`);
+    function schliesseInhaberBereich() {
+        document.getElementById('inhaber-modal').classList.remove('active');
     }
 
-    function renderArbeitsgruppenUI() {
-        const container = document.getElementById('gruppen-container');
-        const select = document.getElementById('helfer-gruppe-select');
-        container.innerHTML = '';
-        select.innerHTML = '';
-
-        if (arbeitsgruppen.length === 0) {
-            container.innerHTML = '<small style="color:var(--text-muted);">Keine Gruppen vorhanden.</small>';
-            return;
-        }
-
-        arbeitsgruppen.forEach(g => {
-            const opt = document.createElement('option');
-            opt.value = g.id;
-            opt.textContent = `${g.name} (${g.von} - ${g.bis})`;
-            select.appendChild(opt);
-
-            const block = document.createElement('div');
-            block.className = 'gruppe-block';
-
-            let helferHtml = '';
-            g.helfer.forEach((h, hIdx) => {
-                helferHtml += `
-                    <div class="helfer-liste-item">
-                        <span>${h}</span>
-                        <button class="btn-del-helfer" onclick="loescheHelfer(${g.id}, ${hIdx})">×</button>
-                    </div>
-                `;
-            });
-
-            block.innerHTML = `
-                <div class="gruppe-header">
-                    <span>${g.name}</span>
-                    <button class="btn-del-helfer" onclick="loescheGruppe(${g.id})">Gruppe löschen</button>
-                </div>
-                <div class="zeit-inputs" style="margin-bottom: 8px;">
-                    <span>Zeit:</span>
-                    <input type="time" value="${g.von}" onchange="updateGruppeZeit(${g.id}, 'von', this)">
-                    <span>bis</span>
-                    <input type="time" value="${g.bis}" onchange="updateGruppeZeit(${g.id}, 'bis', this)">
-                </div>
-                <div>${helferHtml || '<small style="color:var(--text-muted);">Keine Helfer</small>'}</div>
-            `;
-            container.appendChild(block);
-        });
-    }
-
-    function ladeTagesdaten() {
-        if (localStorage.getItem('kasse_tagesumsatz') !== null) tagesumsatz = parseFloat(localStorage.getItem('kasse_tagesumsatz'));
-        if (localStorage.getItem('kasse_umsatz_getraenke') !== null) umsatzGetraenke = parseFloat(localStorage.getItem('kasse_umsatz_getraenke'));
-        if (localStorage.getItem('kasse_umsatz_verzehr') !== null) umsatzVerzehr = parseFloat(localStorage.getItem('kasse_umsatz_verzehr'));
-        if (localStorage.getItem('kasse_tagesgewinn') !== null) tagesgewinn = parseFloat(localStorage.getItem('kasse_tagesgewinn'));
-        if (localStorage.getItem('kasse_anzahl_verkaeufe') !== null) anzahlVerkaeufe = parseInt(localStorage.getItem('kasse_anzahl_verkaeufe'), 10);
-        if (localStorage.getItem('kasse_anfangsbestand') !== null) anfangsbestand = parseFloat(localStorage.getItem('kasse_anfangsbestand'));
-        if (localStorage.getItem('kasse_verkaeufe_statistik') !== null) verkaeufeStatistik = JSON.parse(localStorage.getItem('kasse_verkaeufe_statistik'));
-        if (localStorage.getItem('kasse_helfer_statistik') !== null) helferStatistik = JSON.parse(localStorage.getItem('kasse_helfer_statistik'));
-        if (localStorage.getItem('kasse_letzter_bon') !== null) letzterBon = JSON.parse(localStorage.getItem('kasse_letzter_bon'));
-    }
-
-    function speichereTagesdaten() {
-        localStorage.setItem('kasse_tagesumsatz', tagesumsatz.toString());
-        localStorage.setItem('kasse_umsatz_getraenke', umsatzGetraenke.toString());
-        localStorage.setItem('kasse_umsatz_verzehr', umsatzVerzehr.toString());
-        localStorage.setItem('kasse_tagesgewinn', tagesgewinn.toString());
-        localStorage.setItem('kasse_anzahl_verkaeufe', anzahlVerkaeufe.toString());
-        localStorage.setItem('kasse_verkaeufe_statistik', JSON.stringify(verkaeufeStatistik));
-        localStorage.setItem('kasse_helfer_statistik', JSON.stringify(helferStatistik));
-        localStorage.setItem('kasse_letzter_bon', JSON.stringify(letzterBon));
-    }
-
-    function aktualisiereKassenbestandAnzeige() {
-        const gesamtKassenbestand = anfangsbestand + tagesumsatz;
-        document.getElementById('kassenbestand-anzeige').textContent = gesamtKassenbestand.toFixed(2).replace('.', ',');
-        document.getElementById('anfangsbestand-anzeige').textContent = anfangsbestand.toFixed(2).replace('.', ',');
+    function switchTab(tabId, event) {
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        if (event) event.currentTarget.classList.add('active');
+        if (tabId === 'tab-tagesabschluss') aktualisiereTagesabschlussVorschau();
+        if (tabId === 'tab-helfer') renderHelferListe();
     }
 
     function aktualisiereTagesabschlussVorschau() {
-        const sollGesamt = anfangsbestand + tagesumsatz;
-        document.getElementById('v-anfang').textContent = anfangsbestand.toFixed(2).replace('.', ',') + ' €';
-        document.getElementById('v-umsatz').textContent = tagesumsatz.toFixed(2).replace('.', ',') + ' €';
-        document.getElementById('v-umsatz-getraenke').textContent = umsatzGetraenke.toFixed(2).replace('.', ',') + ' €';
-        document.getElementById('v-umsatz-verzehr').textContent = umsatzVerzehr.toFixed(2).replace('.', ',') + ' €';
-        document.getElementById('v-gewinn').textContent = tagesgewinn.toFixed(2).replace('.', ',') + ' €';
-        document.getElementById('v-anzahl').textContent = anzahlVerkaeufe;
-        
-        document.getElementById('v-helfer-anzahl').textContent = helferStatistik.anzahl;
-        document.getElementById('v-helfer-wert').textContent = helferStatistik.warenwert.toFixed(2).replace('.', ',') + ' €';
+        let umsatzGetraenke = 0;
+        let umsatzVerzehr = 0;
+        let gewinnGesamt = 0;
+        let helferBonsAnzahl = 0;
+        let helferWarenWert = 0;
+        let artikelStatistik = {};
+        let helferStatistik = {};
 
-        document.getElementById('v-soll').textContent = sollGesamt.toFixed(2).replace('.', ',') + ' €';
+        tagesTransaktionen.forEach(t => {
+            if (t.istHelfer) {
+                helferBonsAnzahl++;
+                t.artikel.forEach(item => {
+                    helferWarenWert += item.preis;
+                    if (!helferStatistik[t.helferName]) {
+                        helferStatistik[t.helferName] = { bons: 0, wert: 0 };
+                    }
+                    helferStatistik[t.helferName].wert += item.preis;
+                });
+                if (t.helferName && helferStatistik[t.helferName]) {
+                    helferStatistik[t.helferName].bons++;
+                }
+            } else {
+                t.artikel.forEach(item => {
+                    if (item.kategorie === 'getraenke') umsatzGetraenke += item.preis;
+                    if (item.kategorie === 'verzehr') umsatzVerzehr += item.preis;
+                    
+                    const einkauf = item.einkauf || 0;
+                    gewinnGesamt += (item.preis - einkauf);
 
-        const artikelTabelle = document.getElementById('v-artikel-tabelle');
-        artikelTabelle.innerHTML = `
-            <tr>
-                <th>Produkt</th>
-                <th style="text-align: center;">Menge (Stk.)</th>
-                <th style="text-align: right;">Gesamtumsatz</th>
-            </tr>
-        `;
+                    if (!artikelStatistik[item.name]) {
+                        artikelStatistik[item.name] = { menge: 0, umsatz: 0 };
+                    }
+                    artikelStatistik[item.name].menge += 1;
+                    artikelStatistik[item.name].umsatz += item.preis;
+                });
+            }
+        });
 
-        const keys = Object.keys(verkaeufeStatistik);
-        if (keys.length === 0) {
-            const row = artikelTabelle.insertRow();
-            const cell = row.insertCell(0);
-            cell.colSpan = 3;
-            cell.style.textAlign = 'center';
-            cell.style.color = 'var(--text-muted)';
-            cell.style.padding = '12px';
-            cell.textContent = 'Bisher noch keine Artikel verkauft.';
-        } else {
-            keys.forEach(prodName => {
-                const stat = verkaeufeStatistik[prodName];
-                const row = artikelTabelle.insertRow();
-                row.insertCell(0).textContent = prodName;
-                
-                const cellMenge = row.insertCell(1);
-                cellMenge.style.textAlign = 'center';
-                cellMenge.textContent = stat.anzahl;
+        const umsatzGesamt = umsatzGetraenke + umsatzVerzehr;
+        const sollGesamt = anfangsbestand + umsatzGesamt;
 
-                const cellUmsatz = row.insertCell(2);
-                cellUmsatz.style.textAlign = 'right';
-                cellUmsatz.textContent = stat.gesamt.toFixed(2).replace('.', ',') + ' €';
-            });
+        document.getElementById('v-anfang').innerText = anfangsbestand.toFixed(2) + ' €';
+        document.getElementById('v-umsatz').innerText = umsatzGesamt.toFixed(2) + ' €';
+        document.getElementById('v-umsatz-getraenke').innerText = umsatzGetraenke.toFixed(2) + ' €';
+        document.getElementById('v-umsatz-verzehr').innerText = umsatzVerzehr.toFixed(2) + ' €';
+        document.getElementById('v-gewinn').innerText = gewinnGesamt.toFixed(2) + ' €';
+        document.getElementById('v-anzahl').innerText = tagesTransaktionen.filter(t => !t.istHelfer).length;
+        document.getElementById('v-helfer-anzahl').innerText = helferBonsAnzahl;
+        document.getElementById('v-helfer-wert').innerText = helferWarenWert.toFixed(2) + ' €';
+        document.getElementById('v-soll').innerText = sollGesamt.toFixed(2) + ' €';
+
+        const artTabelle = document.getElementById('v-artikel-tabelle');
+        artTabelle.innerHTML = `<tr><th>Produkt</th><th style="text-align: center;">Menge (Stk.)</th><th style="text-align: right;">Gesamtumsatz</th></tr>`;
+        for (let [name, data] of Object.entries(artikelStatistik)) {
+            artTabelle.innerHTML += `<tr><td>${name}</td><td style="text-align: center;">${data.menge}</td><td style="text-align: right;">${data.umsatz.toFixed(2)} €</td></tr>`;
         }
 
         const helferTabelle = document.getElementById('v-helfer-tabelle');
-        helferTabelle.innerHTML = `
-            <tr>
-                <th>Helfer</th>
-                <th style="text-align: center;">Anzahl Bons</th>
-                <th style="text-align: right;">Warenwert (kostenlos)</th>
-            </tr>
-        `;
-        const helferKeys = Object.keys(helferStatistik.helfer);
-        if (helferKeys.length === 0) {
-            const row = helferTabelle.insertRow();
-            const cell = row.insertCell(0);
-            cell.colSpan = 3;
-            cell.style.textAlign = 'center';
-            cell.style.color = 'var(--text-muted)';
-            cell.style.padding = '12px';
-            cell.textContent = 'Bisher keine kostenlosen Helfer-Ausgaben.';
-        } else {
-            helferKeys.forEach(hName => {
-                const hStat = helferStatistik.helfer[hName];
-                const row = helferTabelle.insertRow();
-                row.insertCell(0).textContent = hName;
-                
-                const cellAnzahl = row.insertCell(1);
-                cellAnzahl.style.textAlign = 'center';
-                cellAnzahl.textContent = hStat.anzahl;
-
-                const cellWert = row.insertCell(2);
-                cellWert.style.textAlign = 'right';
-                cellWert.textContent = hStat.warenwert.toFixed(2).replace('.', ',') + ' €';
-            });
+        helferTabelle.innerHTML = `<tr><th>Helfer</th><th style="text-align: center;">Anzahl Bons</th><th style="text-align: right;">Warenwert (kostenlos)</th></tr>`;
+        for (let [name, data] of Object.entries(helferStatistik)) {
+            helferTabelle.innerHTML += `<tr><td>${name}</td><td style="text-align: center;">${data.bons}</td><td style="text-align: right;">${data.wert.toFixed(2)} €</td></tr>`;
         }
     }
 
-    function anfangsbestandAendern() {
-        const eingabe = prompt("Wechselgeld-Anfangsbestand eingeben (€):", anfangsbestand.toFixed(2));
-        if (eingabe !== null) {
-            const neuBestand = parseFloat(eingabe.replace(',', '.'));
-            if (!isNaN(neuBestand) && neuBestand >= 0) {
-                anfangsbestand = neuBestand;
-                localStorage.setItem('kasse_anfangsbestand', anfangsbestand.toString());
-                aktualisiereKassenbestandAnzeige();
-            } else {
-                alert("Bitte einen gültigen Zahlenwert eingeben!");
-            }
-        }
-    }
+    function speichereProdukt() {
+        const id = document.getElementById('edit-produkt-id').value;
+        const name = document.getElementById('neuer-name').value.trim();
+        const preis = parseFloat(document.getElementById('neuer-preis').value);
+        const einkauf = parseFloat(document.getElementById('neuer-einkaufspreis').value) || 0;
+        const kategorie = document.getElementById('neue-kategorie').value;
+        const farbe = document.getElementById('neue-farbe').value;
 
-    function verbucheUmsatz(betrag, verkaufteArtikel) {
-        if (istHelferAusgabe) {
-            let reelerWarenwert = 0;
-            verkaufteArtikel.forEach(item => reelerWarenwert += item.originalPreis);
-
-            helferStatistik.anzahl += 1;
-            helferStatistik.warenwert += reelerWarenwert;
-
-            if (!helferStatistik.helfer[aktuellerHelferName]) {
-                helferStatistik.helfer[aktuellerHelferName] = { anzahl: 0, warenwert: 0.00 };
-            }
-            helferStatistik.helfer[aktuellerHelferName].anzahl += 1;
-            helferStatistik.helfer[aktuellerHelferName].warenwert += reelerWarenwert;
-        } else {
-            tagesumsatz += betrag;
-            anzahlVerkaeufe += 1;
-
-            verkaufteArtikel.forEach(item => {
-                if (item.kategorie === 'getraenke') {
-                    umsatzGetraenke += item.preis;
-                } else {
-                    umsatzVerzehr += item.preis;
-                }
-
-                const artikelGewinn = item.preis - item.ek;
-                tagesgewinn += artikelGewinn;
-
-                if (!verkaeufeStatistik[item.name]) {
-                    verkaeufeStatistik[item.name] = { anzahl: 0, gesamt: 0.00, ek: item.ek, preis: item.preis, gewinn: 0.00 };
-                }
-                verkaeufeStatistik[item.name].anzahl += 1;
-                verkaeufeStatistik[item.name].gesamt += item.preis;
-                verkaeufeStatistik[item.name].gewinn += artikelGewinn;
-            });
-        }
-
-        letzterBon = {
-            betrag: betrag,
-            artikel: [...verkaufteArtikel],
-            istHelfer: istHelferAusgabe,
-            helferName: aktuellerHelferName
-        };
-
-        speichereTagesdaten();
-        aktualisiereKassenbestandAnzeige();
-    }
-
-    function storniereLetztenBon() {
-        if (!letzterBon || !letzterBon.artikel || letzterBon.artikel.length === 0) {
-            alert("Es gibt keinen abgerechneten Bon zum Stornieren!");
+        if (!name || isNaN(preis)) {
+            alert('Bitte geben Sie einen Produktnamen und einen gültigen Preis ein.');
             return;
         }
 
-        if (confirm("Möchten Sie den LETZTEN BON wirklich komplett stornieren?")) {
-            if (letzterBon.istHelfer) {
-                let reelerWarenwert = 0;
-                letzterBon.artikel.forEach(item => reelerWarenwert += item.originalPreis);
-                helferStatistik.anzahl = Math.max(0, helferStatistik.anzahl - 1);
-                helferStatistik.warenwert = Math.max(0, helferStatistik.warenwert - reelerWarenwert);
-                if (helferStatistik.helfer[letzterBon.helferName]) {
-                    helferStatistik.helfer[letzterBon.helferName].anzahl = Math.max(0, helferStatistik.helfer[letzterBon.helferName].anzahl - 1);
-                    helferStatistik.helfer[letzterBon.helferName].warenwert = Math.max(0, helferStatistik.helfer[letzterBon.helferName].warenwert - reelerWarenwert);
-                }
-            } else {
-                tagesumsatz -= letzterBon.betrag;
-                if (tagesumsatz < 0) tagesumsatz = 0;
-                anzahlVerkaeufe = Math.max(0, anzahlVerkaeufe - 1);
-
-                letzterBon.artikel.forEach(item => {
-                    if (item.kategorie === 'getraenke') {
-                        umsatzGetraenke -= item.preis;
-                        if (umsatzGetraenke < 0) umsatzGetraenke = 0;
-                    } else {
-                        umsatzVerzehr -= item.preis;
-                        if (umsatzVerzehr < 0) umsatzVerzehr = 0;
-                    }
-
-                    const artikelGewinn = item.preis - item.ek;
-                    tagesgewinn -= artikelGewinn;
-                    if (verkaeufeStatistik[item.name]) {
-                        verkaeufeStatistik[item.name].anzahl -= 1;
-                        verkaeufeStatistik[item.name].gesamt -= item.preis;
-                        verkaeufeStatistik[item.name].gewinn -= artikelGewinn;
-                        if (verkaeufeStatistik[item.name].anzahl <= 0) {
-                            delete verkaeufeStatistik[item.name];
-                        }
-                    }
-                });
-                if (tagesgewinn < 0) tagesgewinn = 0;
+        if (id) {
+            const p = produkte.find(item => item.id == id);
+            if (p) {
+                p.name = name;
+                p.preis = preis;
+                p.einkauf = einkauf;
+                p.kategorie = kategorie;
+                p.farbe = farbe;
             }
+        } else {
+            const neuesProdukt = {
+                id: Date.now(),
+                name,
+                preis,
+                einkauf,
+                kategorie,
+                farbe
+            };
+            produkte.push(neuesProdukt);
+        }
 
-            letzterBon = null;
-            localStorage.removeItem('kasse_letzter_bon');
-            speichereTagesdaten();
-            aktualisiereKassenbestandAnzeige();
-            aktualisiereTagesabschlussVorschau();
-            alert("Letzter Bon wurde storniert!");
-            schliesseInhaberModal();
+        localStorage.setItem('kasse_produkte', JSON.stringify(produkte));
+        zuruecksetzenProduktFormular();
+        renderProdukte();
+    }
+
+    function bearbeiteProdukt(id) {
+        const p = produkte.find(item => item.id == id);
+        if (p) {
+            document.getElementById('edit-produkt-id').value = p.id;
+            document.getElementById('neuer-name').value = p.name;
+            document.getElementById('neuer-preis').value = p.preis;
+            document.getElementById('neuer-einkaufspreis').value = p.einkauf || '';
+            document.getElementById('neue-kategorie').value = p.kategorie;
+            document.getElementById('neue-farbe').value = p.farbe || '#2563eb';
+            document.getElementById('btn-produkt-abbrechen').style.display = 'block';
         }
     }
 
-    function oefneHelferAuswahlModal() {
-        const container = document.getElementById('helfer-auswahl-gruppen-container');
-        container.innerHTML = '';
-
-        if (arbeitsgruppen.length === 0) {
-            container.innerHTML = '<p style="color:var(--text-muted); font-size: 13px;">Keine Arbeitsgruppen eingerichtet.</p>';
-        } else {
-            arbeitsgruppen.forEach(g => {
-                const grpDiv = document.createElement('div');
-                grpDiv.style.marginBottom = '12px';
-                
-                const title = document.createElement('div');
-                title.style.fontWeight = '700';
-                title.style.fontSize = '13px';
-                title.style.marginBottom = '6px';
-                title.textContent = `📋 ${g.name}`;
-                grpDiv.appendChild(title);
-
-                const grid = document.createElement('div');
-                grid.className = 'helfer-auswahl-grid';
-
-                if (g.helfer.length === 0) {
-                    grid.innerHTML = '<span style="color:var(--text-muted); font-size:12px; grid-column: span 3;">Keine Helfer</span>';
-                } else {
-                    g.helfer.forEach(hName => {
-                        const btn = document.createElement('button');
-                        btn.className = 'btn-helfer-select';
-                        btn.textContent = hName;
-                        btn.onclick = function() { waehleHelfer(hName, g.name); };
-                        grid.appendChild(btn);
-                    });
-                }
-                grpDiv.appendChild(grid);
-                container.appendChild(grpDiv);
-            });
+    function loescheProdukt(id) {
+        if (confirm('Möchten Sie dieses Produkt wirklich löschen?')) {
+            produkte = produkte.filter(item => item.id != id);
+            localStorage.setItem('kasse_produkte', JSON.stringify(produkte));
+            renderProdukte();
         }
-        document.getElementById('manuell-helfer-input').value = '';
+    }
+
+    function zuruecksetzenProduktFormular() {
+        document.getElementById('edit-produkt-id').value = '';
+        document.getElementById('neuer-name').value = '';
+        document.getElementById('neuer-preis').value = '';
+        document.getElementById('neuer-einkaufspreis').value = '';
+        document.getElementById('btn-produkt-abbrechen').style.display = 'none';
+    }
+
+    function renderProdukteVerwaltungTabelle() {
+        const tab = document.getElementById('tabelle-produkte-verwaltung');
+        tab.innerHTML = `<tr><th>Produkt</th><th>Kat.</th><th>Preis</th><th style="text-align: right;">Aktion</th></tr>`;
+        produkte.forEach(p => {
+            tab.innerHTML += `
+                <tr>
+                    <td>${p.name}</td>
+                    <td>${p.kategorie}</td>
+                    <td>${p.preis.toFixed(2)} €</td>
+                    <td style="text-align: right;">
+                        <button class="btn-tabelle-aktion btn-tabelle-edit" onclick="bearbeiteProdukt(${p.id})">Bearb.</button>
+                        <button class="btn-tabelle-aktion btn-tabelle-del" onclick="loescheProdukt(${p.id})">Löschen</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function oefneHelferAuswahlModal() {
+        if (warenkorb.length === 0) {
+            alert('Bitte wählen Sie zuerst die Artikel aus, die der Helfer erhalten soll.');
+            return;
+        }
+        const container = document.getElementById('helfer-auswahl-grid-container');
+        container.innerHTML = '';
+        
+        helferListe.forEach(h => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-helfer-select';
+            btn.innerText = h;
+            btn.onclick = () => waehleHelferAus(h);
+            container.appendChild(btn);
+        });
+
         document.getElementById('helfer-auswahl-modal').classList.add('active');
     }
 
@@ -1826,340 +1324,109 @@
         document.getElementById('helfer-auswahl-modal').classList.remove('active');
     }
 
-    function waehleHelferManuell() {
-        const val = document.getElementById('manuell-helfer-input').value.trim();
-        if (val) {
-            waehleHelfer(val, "Manuell");
-        } else {
-            alert("Bitte Namen eingeben!");
-        }
-    }
-
-    function waehleHelfer(hName, gruppenName) {
-        aktuellerHelferName = `${hName} (${gruppenName})`;
+    function waehleHelferAus(name) {
+        aktuellerHelfer = name;
         istHelferAusgabe = true;
-        warenkorb.forEach(item => item.preis = 0);
-
-        const banner = document.getElementById('eigenbedarf-banner');
-        banner.innerText = `HELFER: ${aktuellerHelferName.toUpperCase()}`;
-        banner.classList.add('active');
-
-        aktualisiereBon();
+        document.getElementById('eigenbedarf-banner').innerText = `HELFER-AUSGABE: ${name}`;
+        document.getElementById('eigenbedarf-banner').classList.add('active');
         schliesseHelferAuswahlModal();
+        aktualisiereWarenkorbAnsicht();
     }
 
-    function oefneInhaberBereich() {
-        const eingabePin = prompt("Bitte Inhaber-PIN eingeben:");
-        if (eingabePin === INHABER_PIN) {
-            document.getElementById('inhaber-modal').classList.add('active');
-            aktualisiereTagesabschlussVorschau();
-            renderInhaberProduktTabelle();
-        } else if (eingabePin !== null) {
-            alert("Falscher PIN!");
+    function fuegeHelferHinzu() {
+        const name = document.getElementById('neuer-helfer-name').value.trim();
+        if (name && !helferListe.includes(name)) {
+            helferListe.push(name);
+            localStorage.setItem('kasse_helfer', JSON.stringify(helferListe));
+            document.getElementById('neuer-helfer-name').value = '';
+            renderHelferListe();
         }
     }
 
-    function schliesseInhaberModal() {
-        document.getElementById('inhaber-modal').classList.remove('active');
+    function loescheHelfer(name) {
+        helferListe = helferListe.filter(h => h !== name);
+        localStorage.setItem('kasse_helfer', JSON.stringify(helferListe));
+        renderHelferListe();
+    }
+
+    function renderHelferListe() {
+        const container = document.getElementById('helfer-liste-container');
+        container.innerHTML = '';
+        helferListe.forEach(h => {
+            container.innerHTML += `
+                <div class="helfer-liste-item">
+                    <span>${h}</span>
+                    <button class="btn-del-helfer" onclick="loescheHelfer('${h}')">Löschen</button>
+                </div>
+            `;
+        });
+    }
+
+    function speichereWechselgeld(wert) {
+        anfangsbestand = parseFloat(wert) || 0;
+        localStorage.setItem('kasse_anfangsbestand', anfangsbestand);
+        aktualisiereAnzeige();
+    }
+
+    function speichereGeschaeftsdaten() {}
+
+    function storniereLetztenBon() {
+        if (!letzterGedruckterBon) {
+            alert('Kein letzter Bon zum Stornieren vorhanden.');
+            return;
+        }
+        if (confirm('Möchten Sie den letzten Bon komplett stornieren?')) {
+            tagesTransaktionen = tagesTransaktionen.filter(t => t.id !== letzterGedruckterBon.id);
+            letzterGedruckterBon = null;
+            localStorage.setItem('kasse_tages_transaktionen', JSON.stringify(tagesTransaktionen));
+            localStorage.removeItem('kasse_letzter_bon');
+            aktualisiereAnzeige();
+            aktualisiereTagesabschlussVorschau();
+            alert('Letzter Bon wurde storniert.');
+        }
     }
 
     function starteTagesabschlussProcess() {
-        if (confirm("Sind die Werte in der Vorschau korrekt? Der Tagesabschluss wird freigegeben, als Excel exportiert und die Kasse zurückgesetzt!")) {
-            exportiereTagesabschlussExcel();
-            tagesabschlussZuruecksetzen();
-            schliesseInhaberModal();
+        if (confirm('Möchten Sie den Tagesabschluss jetzt durchführen, den Excel-Bericht herunterladen und die Tagesdaten zurücksetzen?')) {
+            exportriereExcel();
+            tagesTransaktionen = [];
+            letzterGedruckterBon = null;
+            localStorage.removeItem('kasse_tages_transaktionen');
+            localStorage.removeItem('kasse_letzter_bon');
+            aktualisiereAnzeige();
+            schliesseInhaberBereich();
         }
     }
 
-    function exportiereTagesabschlussExcel() {
-        const datum = new Date().toLocaleDateString('de-DE');
-        let data = [
-            ["TAGESABSCHLUSS & KASSENBERICHT"],
-            ["Datum:", datum],
-            [""],
-            ["Wechselgeld-Anfangsbestand", anfangsbestand],
-            ["Tageseinnahmen Gesamt", tagesumsatz],
-            ["  - davon Getränke", umsatzGetraenke],
-            ["  - davon Verzehr", umsatzVerzehr],
-            ["SOLL-KASSENBESTAND GESAMT", anfangsbestand + tagesumsatz],
-            ["Tagesgewinn", tagesgewinn],
-            ["Anzahl Transaktionen", anzahlVerkaeufe],
-            ["Helfer-Aktionen Gesamt", helferStatistik.anzahl],
-            ["Kostenloser Helfer-Warenwert", helferStatistik.warenwert],
-            [""],
-            ["VERKAUFTE ARTIKEL IM DETAIL"],
-            ["Produkt", "Menge (Stk.)", "Gesamtumsatz (€)"]
-        ];
-
-        Object.keys(verkaeufeStatistik).forEach(prodName => {
-            const stat = verkaeufeStatistik[prodName];
-            data.push([prodName, stat.anzahl, stat.gesamt]);
-        });
-
-        data.push([""]);
-        data.push(["HELFER-GUTHABEN IM DETAIL"]);
-        data.push(["Helfer", "Anzahl Bons", "Warenwert (kostenlos)"]);
-        Object.keys(helferStatistik.helfer).forEach(hName => {
-            const hStat = helferStatistik.helfer[hName];
-            data.push([hName, hStat.anzahl, hStat.warenwert]);
-        });
-
-        let ws = XLSX.utils.aoa_to_sheet(data);
+    function exportriereExcel() {
         let wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Tagesabschluss");
-        XLSX.writeFile(wb, `Tagesabschluss_${datum.replace(/\./g, '-')}.xlsx`);
-    }
-
-    function tagesabschlussZuruecksetzen() {
-        localStorage.removeItem('kasse_tagesumsatz');
-        localStorage.removeItem('kasse_umsatz_getraenke');
-        localStorage.removeItem('kasse_umsatz_verzehr');
-        localStorage.removeItem('kasse_tagesgewinn');
-        localStorage.removeItem('kasse_anzahl_verkaeufe');
-        localStorage.removeItem('kasse_verkaeufe_statistik');
-        localStorage.removeItem('kasse_helfer_statistik');
-        localStorage.removeItem('kasse_letzter_bon');
+        let umsatzGesamt = 0;
+        tagesTransaktionen.forEach(t => { if (!t.istHelfer) umsatzGesamt += t.gesamt; });
         
-        tagesumsatz = 0.00;
-        umsatzGetraenke = 0.00;
-        umsatzVerzehr = 0.00;
-        tagesgewinn = 0.00;
-        anzahlVerkaeufe = 0;
-        verkaeufeStatistik = {};
-        helferStatistik = { anzahl: 0, warenwert: 0.00, helfer: {} };
-        letzterBon = null;
-        
-        aktualisiereKassenbestandAnzeige();
-    }
+        let summaryData = [
+            ["Kassenbericht - Tagesabschluss"],
+            ["Datum", new Date().toLocaleDateString('de-DE')],
+            ["Wechselgeld Anfang", anfangsbestand],
+            ["Umsatz Gesamt", umsatzGesamt],
+            ["Soll-Kassenbestand", anfangsbestand + umsatzGesamt]
+        ];
+        let wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+        XLSX.utils.book_append_sheet(wb, wsSummary, "Zusammenfassung");
 
-    function oefneEditModal(index) {
-        let produkte = JSON.parse(localStorage.getItem('kasse_produkte')) || [];
-        const p = produkte[index];
-        if (!p) return;
-
-        document.getElementById('edit-index').value = index;
-        document.getElementById('edit-name').value = p.name || '';
-        document.getElementById('edit-kategorie').value = p.kategorie || 'verzehr';
-        document.getElementById('edit-ek').value = p.ek || 0;
-        document.getElementById('edit-preis').value = p.preis || 0;
-        document.getElementById('edit-bild-url').value = p.bildUrl || '';
-        document.getElementById('edit-farbe').value = p.farbe || '#2563eb';
-
-        document.getElementById('edit-modal').classList.add('active');
-    }
-
-    function schliesseEditModal() {
-        document.getElementById('edit-modal').classList.remove('active');
-    }
-
-    function speichereProduktAenderung() {
-        const index = parseInt(document.getElementById('edit-index').value, 10);
-        let produkte = JSON.parse(localStorage.getItem('kasse_produkte')) || [];
-
-        produkte[index] = {
-            name: document.getElementById('edit-name').value.trim(),
-            kategorie: document.getElementById('edit-kategorie').value,
-            ek: parseFloat(document.getElementById('edit-ek').value) || 0,
-            preis: parseFloat(document.getElementById('edit-preis').value) || 0,
-            bildUrl: document.getElementById('edit-bild-url').value.trim(),
-            farbe: document.getElementById('edit-farbe').value
-        };
-
-        localStorage.setItem('kasse_produkte', JSON.stringify(produkte));
-        schliesseEditModal();
-        ladeProdukte();
-        renderInhaberProduktTabelle();
-    }
-
-    function loescheProdukt(index) {
-        if (confirm("Dieses Produkt wirklich löschen?")) {
-            let produkte = JSON.parse(localStorage.getItem('kasse_produkte')) || [];
-            produkte.splice(index, 1);
-            localStorage.setItem('kasse_produkte', JSON.stringify(produkte));
-            ladeProdukte();
-            renderInhaberProduktTabelle();
-        }
-    }
-
-    function erstelleNeuesProdukt() {
-        const name = document.getElementById('neuer-name').value.trim();
-        const preis = parseFloat(document.getElementById('neuer-preis').value);
-
-        if (!name || isNaN(preis) || preis <= 0) {
-            alert('Bitte gültigen Namen und Preis eingeben.');
-            return;
-        }
-
-        const produkte = JSON.parse(localStorage.getItem('kasse_produkte')) || [];
-        produkte.push({
-            name,
-            kategorie: document.getElementById('neue-kategorie').value,
-            ek: parseFloat(document.getElementById('neuer-ek').value) || 0,
-            preis,
-            farbe: document.getElementById('neue-farbe').value,
-            bildUrl: document.getElementById('neuer-bild-url').value.trim()
+        let transData = [["Bon-ID", "Zeitpunkt", "Art", "Helfer", "Gesamtbetrag"]];
+        tagesTransaktionen.forEach(t => {
+            transData.push([
+                t.id,
+                new Date(t.zeitpunkt).toLocaleTimeString('de-DE'),
+                t.istHelfer ? "Helfer-Ausgabe" : "Verkauf",
+                t.helferName || "-",
+                t.gesamt
+            ]);
         });
+        let wsTrans = XLSX.utils.aoa_to_sheet(transData);
+        XLSX.utils.book_append_sheet(wb, wsTrans, "Transaktionen");
 
-        localStorage.setItem('kasse_produkte', JSON.stringify(produkte));
-        ladeProdukte();
-        renderInhaberProduktTabelle();
-        
-        // Formularfelder leeren
-        document.getElementById('neuer-name').value = '';
-        document.getElementById('neuer-ek').value = '';
-        document.getElementById('neuer-preis').value = '';
-        document.getElementById('neuer-bild-url').value = '';
-        
-        alert('Produkt erfolgreich gespeichert!');
-    }
-
-    function addProdukt(name, kategorie, ek, preis) {
-        const effekPreis = istHelferAusgabe ? 0 : preis;
-        warenkorb.push({ id: Date.now() + Math.random(), name, kategorie, ek, preis: effekPreis, originalPreis: preis });
-        aktualisiereBon();
-    }
-
-    function entferneArtikelDirekt(id) {
-        warenkorb = warenkorb.filter(item => item.id !== id);
-        aktualisiereBon();
-    }
-
-    function entferneLetztenArtikel() {
-        if (warenkorb.length > 0) {
-            warenkorb.pop();
-            aktualisiereBon();
-        }
-    }
-
-    function aktualisiereBon() {
-        const artikelContainer = document.getElementById('bon-artikel');
-        artikelContainer.innerHTML = '';
-        gesamt = 0;
-
-        warenkorb.forEach(item => {
-            const zeile = document.createElement('div');
-            zeile.className = 'bon-zeile item-row';
-            zeile.title = 'Klicken zum Entfernen';
-            zeile.innerHTML = `<span>${item.name}</span><span>${item.preis.toFixed(2).replace('.', ',')} €</span>`;
-            zeile.onclick = function() { entferneArtikelDirekt(item.id); };
-            artikelContainer.appendChild(zeile);
-            gesamt += item.preis;
-        });
-
-        document.getElementById('summe').textContent = gesamt.toFixed(2).replace('.', ',');
-        berechneRueckgeld();
-    }
-
-    function setGegeben(betrag) {
-        document.getElementById('gegeben-geld').value = betrag;
-        berechneRueckgeld();
-    }
-
-    function berechneRueckgeld() {
-        const gegebenInput = parseFloat(document.getElementById('gegeben-geld').value) || 0;
-        const rueckgeld = gegebenInput - gesamt;
-        const rueckgeldText = document.getElementById('rueckgeld-text');
-        
-        if (gegebenInput >= gesamt && gesamt >= 0) {
-            rueckgeldText.textContent = rueckgeld.toFixed(2).replace('.', ',');
-            rueckgeldText.style.color = 'var(--success)';
-        } else {
-            rueckgeldText.textContent = '0,00';
-            rueckgeldText.style.color = 'var(--warning)';
-        }
-    }
-
-    function bonDrucken() {
-        if (warenkorb.length === 0) {
-            alert("Der Warenkorb ist leer!");
-            return;
-        }
-
-        const gegebenInput = parseFloat(document.getElementById('gegeben-geld').value) || 0;
-        if (!istHelferAusgabe && gegebenInput > 0 && gegebenInput < gesamt) {
-            alert("Das gegebene Geld reicht nicht aus!");
-            return;
-        }
-
-        const nameHTML = document.getElementById('geschaeft-name').innerHTML;
-        const strasse = document.getElementById('geschaeft-strasse').innerText;
-        const ort = document.getElementById('geschaeft-ort').innerText;
-        const tel = document.getElementById('geschaeft-tel').innerText;
-        const fusszeile = document.getElementById('geschaeft-fusszeile').innerText;
-        const logoUrl = document.getElementById('input-logo-url').value.trim();
-        const jetzt = new Date().toLocaleDateString('de-DE') + ' ' + new Date().toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
-
-        const overlay = document.getElementById('druck-ansicht-overlay');
-        overlay.innerHTML = '';
-
-        warenkorb.forEach((item, index) => {
-            const bonDiv = document.createElement('div');
-            bonDiv.className = 'druck-bon-einzel';
-
-            const katTitel = item.kategorie === 'getraenke' ? '🍺 AUSGABE: GETRÄNKE' : '🍔 AUSGABE: VERZEHR';
-            
-            let zahlungsInfoHTML = '';
-            if (index === 0 && !istHelferAusgabe && gegebenInput >= gesamt) {
-                const rueckgeld = gegebenInput - gesamt;
-                zahlungsInfoHTML = `
-                    <div style="border-bottom: 1px dashed #333; margin: 8px 0;"></div>
-                    <div style="display:flex; justify-content:space-between; margin:4px 0;"><span>Gesamt:</span><span><b>${gesamt.toFixed(2).replace('.', ',')} €</b></span></div>
-                    <div style="display:flex; justify-content:space-between; margin:4px 0;"><span>Gegeben:</span><span>${gegebenInput.toFixed(2).replace('.', ',')} €</span></div>
-                    <div style="display:flex; justify-content:space-between; margin:4px 0;"><span>Rückgeld:</span><span>${rueckgeld.toFixed(2).replace('.', ',')} €</span></div>
-                `;
-            } else if (index === 0 && istHelferAusgabe) {
-                zahlungsInfoHTML = `
-                    <div style="border-bottom: 1px dashed #333; margin: 8px 0;"></div>
-                    <div style="text-align:center; font-weight:bold; background:#06b6d4; color:white; padding:4px; margin-bottom:4px;">HELFER: ${aktuellerHelferName.toUpperCase()}</div>
-                `;
-            }
-
-            let logoImgHtml = logoUrl ? `<img src="${logoUrl}" style="max-width:100%; max-height:50px; object-fit:contain; margin-bottom:6px; display:block; margin-left:auto; margin-right:auto;" alt="Logo">` : '';
-
-            bonDiv.innerHTML = `
-                ${logoImgHtml}
-                <div style="text-align:center; font-weight:bold; font-size:14px; line-height:1.2;">${nameHTML}</div>
-                <div style="text-align:center; font-size:11px;">${strasse}</div>
-                <div style="text-align:center; font-size:11px;">${ort}</div>
-                <div style="text-align:center; font-size:11px; margin-bottom:6px;">${tel}</div>
-                
-                <div style="border-bottom: 1px dashed #333; margin: 8px 0;"></div>
-                <div class="druck-header-art">${katTitel}</div>
-                
-                <div style="border-bottom: 1px dashed #333; margin: 8px 0;"></div>
-                <div style="display:flex; justify-content:space-between; margin:6px 0; font-weight:bold; font-size:14px;">
-                    <span>1x ${item.name}</span>
-                    <span>${item.preis.toFixed(2).replace('.', ',')} €</span>
-                </div>
-                
-                ${zahlungsInfoHTML}
-                
-                <div style="border-bottom: 1px dashed #333; margin: 8px 0;"></div>
-                <div style="text-align:center; font-size:11px;">${fusszeile}</div>
-                <div style="text-align:center; font-size:10px; margin-top:4px;">${jetzt} (Bon ${index + 1}/${warenkorb.length})</div>
-            `;
-            overlay.appendChild(bonDiv);
-        });
-
-        verbucheUmsatz(gesamt, warenkorb);
-
-        setTimeout(() => {
-            window.print();
-            storno();
-        }, 300);
-    }
-
-    function storno() {
-        warenkorb = [];
-        istHelferAusgabe = false;
-        aktuellerHelferName = "";
-        document.getElementById('eigenbedarf-banner').classList.remove('active');
-        aktualisiereBon();
-        document.getElementById('bon-datum').textContent = '';
-        document.getElementById('gegeben-geld').value = '';
-        document.getElementById('rueckgeld-text').textContent = '0,00';
-        document.getElementById('bon-zahlung-bereich').style.display = 'none';
-        document.getElementById('druck-ansicht-overlay').innerHTML = '';
+        XLSX.writeFile(wb, `Tagesabschluss_${new Date().toISOString().slice(0,10)}.xlsx`);
     }
 </script>
 
