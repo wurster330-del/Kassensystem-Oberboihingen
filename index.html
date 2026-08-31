@@ -8,7 +8,6 @@
     <meta name="apple-mobile-web-app-title" content="Kassensystem">
     
     <title>Kassensystem - Verein der Hundefreunde Oberboihingen e.V.</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -845,7 +844,7 @@
                     <div class="inhaber-section" style="background: white;">
                         <h4>✅ Freigabe & Export</h4>
                         <p style="font-size: 12px; color: var(--text-muted);">Nach dem Download werden die Tagesdaten zurückgesetzt.</p>
-                        <button class="btn-action btn-inhaber" style="margin-top:5px; background: var(--success);" onclick="starteTagesabschlussProcess()">🚀 Freigeben & Excel-Bericht herunterladen</button>
+                        <button class="btn-action btn-inhaber" style="margin-top:5px; background: var(--success);" onclick="starteTagesabschlussProcess()">🚀 Freigeben & CSV-Bericht herunterladen</button>
                     </div>
 
                     <div class="inhaber-section danger-card">
@@ -1123,6 +1122,8 @@
         const overlay = document.getElementById('druck-ansicht-overlay');
         overlay.innerHTML = '';
 
+        const anzahlGesamtBons = warenkorb.length;
+
         warenkorb.forEach((item, index) => {
             const transaktion = {
                 id: Date.now() + index,
@@ -1148,7 +1149,7 @@
             const bonDiv = document.createElement('div');
             bonDiv.className = 'druck-bon-einzel';
             bonDiv.innerHTML = `
-                <div class="druck-header-art">EINZELBON (${index + 1}/${warenkorb.length})</div>
+                <div class="druck-header-art">EINZELBON (${index + 1}/${anzahlGesamtBons})</div>
                 <div style="text-align:center;">
                     <strong>${geschaeftName}</strong><br>
                     ${geschaeftStrasse}<br>
@@ -1443,7 +1444,7 @@
     }
 
     function starteTagesabschlussProcess() {
-        if (confirm('Möchten Sie den Tagesabschluss jetzt durchführen, den Excel-Bericht herunterladen und die Tagesdaten zurücksetzen?')) {
+        if (confirm('Möchten Sie den Tagesabschluss jetzt durchführen, den CSV-Bericht herunterladen und die Tagesdaten zurücksetzen?')) {
             exportriereExcel();
             tagesTransaktionen = [];
             letzterGedruckterBon = null;
@@ -1455,34 +1456,32 @@
     }
 
     function exportriereExcel() {
-        let wb = XLSX.utils.book_new();
         let umsatzGesamt = 0;
         tagesTransaktionen.forEach(t => { if (!t.istHelfer) umsatzGesamt += t.gesamt; });
+
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Kassensbericht - Tagesabschluss\n";
+        csvContent += `Datum;${new Date().toLocaleDateString('de-DE')}\n`;
+        csvContent += `Wechselgeld Anfang;${anfangsbestand.toFixed(2).replace('.', ',')}\n`;
+        csvContent += `Umsatz Gesamt;${umsatzGesamt.toFixed(2).replace('.', ',')}\n`;
+        csvContent += `Soll-Kassenbestand;${(anfangsbestand + umsatzGesamt).toFixed(2).replace('.', ',')}\n\n`;
         
-        let summaryData = [
-            ["Kassenbericht - Tagesabschluss"],
-            ["Datum", new Date().toLocaleDateString('de-DE')],
-            ["Wechselgeld Anfang", anfangsbestand],
-            ["Umsatz Gesamt", umsatzGesamt],
-            ["Soll-Kassenbestand", anfangsbestand + umsatzGesamt]
-        ];
-        let wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-        XLSX.utils.book_append_sheet(wb, wsSummary, "Zusammenfassung");
-
-        let transData = [["Bon-ID", "Zeitpunkt", "Art", "Helfer", "Gesamtbetrag"]];
+        csvContent += "Bon-ID;Zeitpunkt;Art;Helfer;Gesamtbetrag\n";
         tagesTransaktionen.forEach(t => {
-            transData.push([
-                t.id,
-                new Date(t.zeitpunkt).toLocaleTimeString('de-DE'),
-                t.istHelfer ? "Helfer-Ausgabe" : "Verkauf",
-                t.helferName || "-",
-                t.gesamt
-            ]);
+            let zeit = new Date(t.zeitpunkt).toLocaleTimeString('de-DE');
+            let art = t.istHelfer ? "Helfer-Ausgabe" : "Verkauf";
+            let helfer = t.helferName || "-";
+            let betrag = t.gesamt.toFixed(2).replace('.', ',');
+            csvContent += `${t.id};${zeit};${art};${helfer};${betrag}\n`;
         });
-        let wsTrans = XLSX.utils.aoa_to_sheet(transData);
-        XLSX.utils.book_append_sheet(wb, wsTrans, "Transaktionen");
 
-        XLSX.writeFile(wb, `Tagesabschluss_${new Date().toISOString().slice(0,10)}.xlsx`);
+        let encodedUri = encodeURI(csvContent);
+        let link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Tagesabschluss_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 </script>
 
