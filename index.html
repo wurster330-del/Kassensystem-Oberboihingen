@@ -681,6 +681,16 @@
         <div class="kategorie-titel">🍔 Verzehr</div>
         <div class="grid" id="grid-verzehr"></div>
 
+        <!-- Wert-Getränkebons Sektion (Rein Kasse ohne manuelle Auswahl, da im Inhaber-Bereich) -->
+        <div class="zahlungs-bereich" style="background: #f0fdf4; border-color: #dcfce7;">
+            <label style="margin-bottom: 8px; display: block;"><strong>Getränke / Verzehr-Wertbons ausstellen:</strong></label>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <button class="btn-schein" style="background:#16a34a; color:white; flex: 1;" onclick="druckeWertGetraenkeBon(10)">10 € Bon</button>
+                <button class="btn-schein" style="background:#16a34a; color:white; flex: 1;" onclick="druckeWertGetraenkeBon(15)">15 € Bon</button>
+                <button class="btn-schein" style="background:#16a34a; color:white; flex: 1;" onclick="druckeWertGetraenkeBon(20)">20 € Bon</button>
+            </div>
+        </div>
+
         <div class="zahlungs-bereich">
             <div class="zahlungs-zeile">
                 <label for="gegeben-geld"><strong>Gegeben:</strong></label>
@@ -764,8 +774,10 @@
         <div class="inhaber-header">
             <h3>🔒 Inhaber-Bereich</h3>
             <div class="inhaber-tabs">
-                <button class="tab-btn active" onclick="switchTab('tab-tagesabschluss', event)">📊 Tagesabschluss & Vorschau</button>
-                <button class="tab-btn" onclick="switchTab('tab-produkte', event)">🍕 Produkte verwalten</button>
+                <button class="tab-btn active" onclick="switchTab('tab-tagesabschluss', event)">📊 Tagesabschluss</button>
+                <button class="tab-btn" onclick="switchTab('tab-wertbons', event)">🎟️ Wertbons entwerten</button>
+                <button class="tab-btn" onclick="switchTab('tab-wertbon-config', event)">⚙️ Wertbon-Auswahl</button>
+                <button class="tab-btn" onclick="switchTab('tab-produkte', event)">🍕 Produkte</button>
                 <button class="tab-btn" onclick="switchTab('tab-helfer', event)">👥 Helfer</button>
                 <button class="tab-btn" onclick="switchTab('tab-einstellungen', event)">⚙️ Einstellungen</button>
             </div>
@@ -851,6 +863,75 @@
                         <h4>⚠️ Storno</h4>
                         <p style="font-size: 12px; color: var(--text-muted);">Macht den als letzten gedruckten Bon vollständig rückgängig.</p>
                         <button class="btn-action btn-storno" onclick="storniereLetztenBon()">⚠️ Letzten Bon komplett stornieren</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WERTBONS ENTWERTEN -->
+            <div id="tab-wertbons" class="tab-pane">
+                <div class="inhaber-section highlight-card">
+                    <h4>🎟️ Aktive Wertbons prüfen & Positionen abstreichen</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Geben Sie die Bon-ID ein oder wählen Sie einen ausgegebenen Bon aus, um Einzelwerte beim Einlösen abzuhaken.</p>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="such-bon-id" placeholder="Bon-ID eingeben..." style="flex:1;">
+                        <button class="btn-action btn-modal-save" style="width: auto; padding: 10px 20px;" onclick="sucheWertBonEinloesen()">Bon suchen</button>
+                    </div>
+
+                    <div id="wertbon-einloesen-container" style="background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; display: none;">
+                        <h5 id="wb-titel" style="margin-top:0; font-size:15px; color:var(--primary);">Bon Details</h5>
+                        <p id="wb-info" style="font-size: 13px; color: var(--text-muted);"></p>
+                        <div id="wb-positionen-liste" style="margin: 15px 0;"></div>
+                        <button class="btn-action btn-modal-save" onclick="speichereWertbonEinloesung()">Ausgewählte Positionen entwerten / verbuchen</button>
+                    </div>
+
+                    <h4 style="margin-top: 20px; font-size: 14px;">Liste aller offenen Wertbons</h4>
+                    <table class="tagesabschluss-vorschau-tabelle" id="offene-wertbons-tabelle">
+                        <tr>
+                            <th>Bon-ID</th>
+                            <th>Uhrzeit</th>
+                            <th>Gesamtwert</th>
+                            <th>Restwert</th>
+                            <th style="text-align: right;">Aktion</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- WERTBON-KONFIGURATION / MANUELLE AUSWAHL (NUR INHABER) -->
+            <div id="tab-wertbon-config" class="tab-pane">
+                <div class="inhaber-section highlight-card">
+                    <h4>⚙️ Manuelle Auswahl: Wertbon-Zusammenstellung (10€ / 15€ / 20€)</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Legen Sie hier im Inhaber-Bereich fest, mit welchen Standard-Stückelungen die Wertbons (10 €, 15 €, 20 €) erstellt werden sollen[cite: 1].</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
+                        <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <label for="preset-10"><strong>10 € Bon Zusammenstellung:</strong></label>
+                            <select id="preset-10" class="btn-schein" style="width: 100%; background: white; font-size: 13px; padding: 8px; margin-top: 8px;">
+                                <option value="standard">Standard (Misch)</option>
+                                <option value="nur_klein">Nur kleine Werte (≤2€)</option>
+                                <option value="50cent">Viele 50-Cent-Bons</option>
+                            </select>
+                        </div>
+                        <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <label for="preset-15"><strong>15 € Bon Zusammenstellung:</strong></label>
+                            <select id="preset-15" class="btn-schein" style="width: 100%; background: white; font-size: 13px; padding: 8px; margin-top: 8px;">
+                                <option value="standard">Standard (Misch)</option>
+                                <option value="nur_klein">Nur kleine Werte (≤2€)</option>
+                                <option value="grosse_stuecke">Mehr 5-Euro-Stücke</option>
+                            </select>
+                        </div>
+                        <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <label for="preset-20"><strong>20 € Bon Zusammenstellung:</strong></label>
+                            <select id="preset-20" class="btn-schein" style="width: 100%; background: white; font-size: 13px; padding: 8px; margin-top: 8px;">
+                                <option value="standard">Standard (Misch)</option>
+                                <option value="nur_5er">Viel 5 € & 2 €</option>
+                                <option value="50cent">Mit vielen 50-Cent-Bons</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn-action btn-modal-save" onclick="speichereWertbonKonfiguration()">Konfiguration speichern</button>
                     </div>
                 </div>
             </div>
@@ -976,19 +1057,41 @@
     let helferListe = JSON.parse(localStorage.getItem('kasse_helfer')) || ['Max Mustermann', 'Erika Musterfrau', 'Hans Dampf'];
     let anfangsbestand = parseFloat(localStorage.getItem('kasse_anfangsbestand')) || 100.00;
     
+    // Gespeicherte Wertbon-Konfigurationen laden oder Standard setzen
+    let wertbonConfig = JSON.parse(localStorage.getItem('kasse_wertbon_config')) || {
+        p10: 'standard',
+        p15: 'standard',
+        p20: 'standard'
+    };
+    
     let warenkorb = [];
     let tagesTransaktionen = JSON.parse(localStorage.getItem('kasse_tages_transaktionen')) || [];
     let letzterGedruckterBon = JSON.parse(localStorage.getItem('kasse_letzter_bon')) || null;
     let istHelferAusgabe = false;
     let aktuellerHelfer = '';
+    let aktuellerBearbeitungsBon = null;
 
     document.addEventListener('DOMContentLoaded', () => {
         aktualisiereDatum();
         renderProdukte();
         aktualisiereAnzeige();
         document.getElementById('input-wechselgeld').value = anfangsbestand.toFixed(2);
+        
+        // Dropdowns im Inhaber-Bereich mit gespeicherten Werten initialisieren
+        if(document.getElementById('preset-10')) document.getElementById('preset-10').value = wertbonConfig.p10;
+        if(document.getElementById('preset-15')) document.getElementById('preset-15').value = wertbonConfig.p15;
+        if(document.getElementById('preset-20')) document.getElementById('preset-20').value = wertbonConfig.p20;
+
         setInterval(aktualisiereDatum, 1000);
     });
+
+    function speichereWertbonKonfiguration() {
+        wertbonConfig.p10 = document.getElementById('preset-10').value;
+        wertbonConfig.p15 = document.getElementById('preset-15').value;
+        wertbonConfig.p20 = document.getElementById('preset-20').value;
+        localStorage.setItem('kasse_wertbon_config', JSON.stringify(wertbonConfig));
+        alert('Wertbon-Konfiguration erfolgreich im Inhaber-Bereich gespeichert!');
+    }
 
     function aktualisiereDatum() {
         const jetzt = new Date();
@@ -1113,6 +1216,268 @@
         bonDrucken();
     }
 
+    // Wertbons mit dynamischer Stückelung basierend auf der Inhaber-Konfiguration
+    function druckeWertGetraenkeBon(gesamtwert) {
+        let preset = 'standard';
+        if (gesamtwert === 10) preset = wertbonConfig.p10;
+        if (gesamtwert === 15) preset = wertbonConfig.p15;
+        if (gesamtwert === 20) preset = wertbonConfig.p20;
+        
+        const id = Date.now();
+        const zeitpunkt = new Date().toISOString();
+        let positionen = [];
+
+        if (gesamtwert === 10) {
+            if (preset === 'nur_klein') {
+                positionen = [
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false }
+                ];
+            } else if (preset === '50cent') {
+                positionen = [
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false }
+                ];
+            } else {
+                positionen = [
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false }
+                ];
+            }
+        } else if (gesamtwert === 15) {
+            if (preset === 'nur_klein') {
+                positionen = [
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false }
+                ];
+            } else if (preset === 'grosse_stuecke') {
+                positionen = [
+                    { wert: 5.00, text: '5,00 €', eingelost: false },
+                    { wert: 5.00, text: '5,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false }
+                ];
+            } else {
+                positionen = [
+                    { wert: 5.00, text: '5,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false }
+                ];
+            }
+        } else if (gesamtwert === 20) {
+            if (preset === 'nur_5er') {
+                positionen = [
+                    { wert: 5.00, text: '5,00 €', eingelost: false },
+                    { wert: 5.00, text: '5,00 €', eingelost: false },
+                    { wert: 5.00, text: '5,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false }
+                ];
+            } else if (preset === '50cent') {
+                positionen = [
+                    { wert: 5.00, text: '5,00 €', eingelost: false },
+                    { wert: 5.00, text: '5,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false }
+                ];
+            } else {
+                positionen = [
+                    { wert: 5.00, text: '5,00 €', eingelost: false },
+                    { wert: 5.00, text: '5,00 €', eingelost: false },
+                    { wert: 5.00, text: '5,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false }
+                ];
+            }
+        } else {
+            positionen = [{ wert: gesamtwert, text: `${gesamtwert.toFixed(2)} €`, eingelost: false }];
+        }
+
+        const wertBonTransaktion = {
+            id: id,
+            zeitpunkt: zeitpunkt,
+            artikel: [{ name: `Getränke/Verzehr-Wertbon ${gesamtwert.toFixed(2)} €`, preis: gesamtwert, kategorie: 'wertbon' }],
+            gesamt: gesamtwert,
+            istHelfer: false,
+            istWertBon: true,
+            positionen: positionen,
+            restwert: gesamtwert
+        };
+
+        tagesTransaktionen.push(wertBonTransaktion);
+        letzterGedruckterBon = wertBonTransaktion;
+        localStorage.setItem('kasse_tages_transaktionen', JSON.stringify(tagesTransaktionen));
+        localStorage.setItem('kasse_letzter_bon', JSON.stringify(letzterGedruckterBon));
+
+        let posHtml = '';
+        positionen.forEach((p, idx) => {
+            posHtml += `<div style="display:flex; justify-content:space-between; margin:3px 0;"><span>[  ] ${p.text}</span><span>(Pos ${idx+1})</span></div>`;
+        });
+
+        const overlay = document.getElementById('druck-ansicht-overlay');
+        overlay.innerHTML = `
+            <div class="druck-bon-einzel" style="width: 300px; margin: 0 auto; font-family: 'Courier New', Courier, monospace;">
+                <div class="druck-header-art">GETRÄNKE/VERZEHR-GUTSCHEIN</div>
+                <div style="text-align:center;">
+                    <strong>Verein der Hundefreunde Oberboihingen e.V.</strong><br>
+                    Bon-ID: <strong>${id}</strong>
+                </div>
+                <div class="trennlinie"></div>
+                <div><strong>Gesamtwert: ${gesamtwert.toFixed(2)} €</strong></div>
+                <div style="margin-top: 8px; font-size: 12px; font-weight: bold;">Abstreichbare Positionen:</div>
+                <div style="margin: 6px 0; font-size: 12px;">
+                    ${posHtml}
+                </div>
+                <div class="trennlinie"></div>
+                <div style="font-size: 11px; text-align: center;">Bitte bei Entnahme einzeln abstreichen.<br>${new Date().toLocaleDateString('de-DE')} ${new Date().toLocaleTimeString('de-DE')}</div>
+            </div>
+        `;
+
+        window.print();
+        aktualisiereTagesabschlussVorschau();
+        aktualisiereOffeneWertbonsTabelle();
+    }
+
+    function sucheWertBonEinloesen() {
+        const idInput = document.getElementById('such-bon-id').value.trim();
+        const bon = tagesTransaktionen.find(t => t.id == idInput && t.istWertBon);
+        
+        const container = document.getElementById('wertbon-einloesen-container');
+        if (!bon) {
+            alert('Kein offener Wertbon mit dieser ID gefunden.');
+            container.style.display = 'none';
+            return;
+        }
+
+        aktuellerBearbeitungsBon = bon;
+        container.style.display = 'block';
+        document.getElementById('wb-titel').innerText = `Wertbon ID: ${bon.id}`;
+        document.getElementById('wb-info').innerText = `Gesamtwert: ${bon.gesamt.toFixed(2)} € | Aktueller Restwert: ${bon.restwert.toFixed(2)} €`;
+
+        let listeDiv = document.getElementById('wb-positionen-liste');
+        listeDiv.innerHTML = '<div style="font-weight:bold; margin-bottom:5px;">Wählen Sie die Positionen aus, die eingelöst / abgestrichen werden sollen:</div>';
+        
+        bon.positionen.forEach((p, idx) => {
+            const checkedAttr = p.eingelost ? 'checked disabled' : '';
+            const styleAttr = p.eingelost ? 'text-decoration: line-through; color: #94a3b8;' : '';
+            listeDiv.innerHTML += `
+                <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-weight:normal; ${styleAttr}">
+                    <input type="checkbox" class="wb-pos-checkbox" data-index="${idx}" ${checkedAttr} style="width:auto;">
+                    <span>${p.text} (${p.wert.toFixed(2)} €) ${p.eingelost ? '<strong>[Bereits eingelöst]</strong>' : ''}</span>
+                </label>
+            `;
+        });
+    }
+
+    function speichereWertbonEinloesung() {
+        if (!aktuellerBearbeitungsBon) return;
+
+        const checkboxes = document.querySelectorAll('.wb-pos-checkbox');
+        let abgezogenerWert = 0;
+
+        checkboxes.forEach(cb => {
+            if (cb.checked && !cb.disabled) {
+                const idx = parseInt(cb.getAttribute('data-index'));
+                if (!aktuellerBearbeitungsBon.positionen[idx].eingelost) {
+                    aktuellerBearbeitungsBon.positionen[idx].eingelost = true;
+                    abgezogenerWert += aktuellerBearbeitungsBon.positionen[idx].wert;
+                }
+            }
+        });
+
+        if (abgezogenerWert > 0) {
+            aktuellerBearbeitungsBon.restwert = Math.max(0, aktuellerBearbeitungsBon.restwert - abgezogenerWert);
+            localStorage.setItem('kasse_tages_transaktionen', JSON.stringify(tagesTransaktionen));
+            alert(`Erfolgreich entwertet! Betrag von ${abgezogenerWert.toFixed(2)} € wurde verrechnet.`);
+            sucheWertBonEinloesen();
+            aktualisiereTagesabschlussVorschau();
+            aktualisiereOffeneWertbonsTabelle();
+        } else {
+            alert('Es wurden keine neuen Positionen ausgewählt.');
+        }
+    }
+
+    function aktualisiereOffeneWertbonsTabelle() {
+        const tab = document.getElementById('offene-wertbons-tabelle');
+        if (!tab) return;
+        tab.innerHTML = `<tr><th>Bon-ID</th><th>Uhrzeit</th><th>Gesamtwert</th><th>Restwert</th><th style="text-align: right;">Aktion</th></tr>`;
+        
+        const wertbons = tagesTransaktionen.filter(t => t.istWertBon);
+        wertbons.forEach(wb => {
+            let zeit = new Date(wb.zeitpunkt).toLocaleTimeString('de-DE');
+            tab.innerHTML += `
+                <tr>
+                    <td>${wb.id}</td>
+                    <td>${zeit}</td>
+                    <td>${wb.gesamt.toFixed(2)} €</td>
+                    <td style="color: ${wb.restwert > 0 ? 'var(--success)' : 'var(--text-muted)'}; font-weight:bold;">${wb.restwert.toFixed(2)} €</td>
+                    <td style="text-align: right;">
+                        <button class="btn-tabelle-aktion btn-tabelle-edit" onclick="schnellLadeBon(${wb.id})">Auswählen</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function schnellLadeBon(id) {
+        document.getElementById('such-bon-id').value = id;
+        sucheWertBonEinloesen();
+    }
+
     function bonDrucken() {
         if (warenkorb.length === 0) {
             alert('Der Warenkorb ist leer!');
@@ -1184,12 +1549,11 @@
         aktualisiereAnzeige();
     }
 
-    function aktualisiereAnzeige() {
-        // Soll-Kassenbestand und Wechselgeld Anzeige ist entfernt worden, Funktion bleibt leer zur Fehlervermeidung
-    }
+    function aktualisiereAnzeige() {}
 
     function oefneInhaberBereich() {
         aktualisiereTagesabschlussVorschau();
+        aktualisiereOffeneWertbonsTabelle();
         document.getElementById('inhaber-modal').classList.add('active');
     }
 
@@ -1203,6 +1567,7 @@
         document.getElementById(tabId).classList.add('active');
         if (event) event.currentTarget.classList.add('active');
         if (tabId === 'tab-tagesabschluss') aktualisiereTagesabschlussVorschau();
+        if (tabId === 'tab-wertbons') aktualisiereOffeneWertbonsTabelle();
         if (tabId === 'tab-helfer') renderHelferListe();
     }
 
@@ -1231,7 +1596,7 @@
                 });
             } else {
                 t.artikel.forEach(item => {
-                    if (item.kategorie === 'getraenke') umsatzGetraenke += item.preis;
+                    if (item.kategorie === 'getraenke' || item.kategorie === 'wertbon') umsatzGetraenke += item.preis;
                     if (item.kategorie === 'verzehr') umsatzVerzehr += item.preis;
                     
                     const einkauf = item.einkauf || 0;
@@ -1469,9 +1834,9 @@
         csvContent += "Bon-ID;Zeitpunkt;Art;Helfer;Gesamtbetrag\n";
         tagesTransaktionen.forEach(t => {
             let zeit = new Date(t.zeitpunkt).toLocaleTimeString('de-DE');
-            let art = t.istHelfer ? "Helfer-Ausgabe" : "Verkauf";
+            let art = t.istHelfer ? "Helfer-Ausgabe" : (t.istWertBon ? "Getränke/Verzehr-Wertbon" : "Verkauf");
             let helfer = t.helferName || "-";
-            let betrag = t.gesamt.toFixed(2).replace('.', ',');
+            let betrag = t.gesamt.getvalue ? t.gesamt.toFixed(2).replace('.', ',') : t.gesamt.toFixed(2).replace('.', ',');
             csvContent += `${t.id};${zeit};${art};${helfer};${betrag}\n`;
         });
 
