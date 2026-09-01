@@ -151,10 +151,10 @@
         }
 
         .produkt-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             text-align: center;
-            line-height: 1.2;
+            line-height: 1.1;
             text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.8);
             word-break: break-word;
             margin-top: 2px;
@@ -681,7 +681,7 @@
         <div class="kategorie-titel">🍔 Verzehr</div>
         <div class="grid" id="grid-verzehr"></div>
 
-        <!-- Wert-Getränkebons Sektion (Rein Kasse ohne manuelle Auswahl, da im Inhaber-Bereich) -->
+        <!-- Wert-Getränkebons Sektion -->
         <div class="zahlungs-bereich" style="background: #f0fdf4; border-color: #dcfce7;">
             <label style="margin-bottom: 8px; display: block;"><strong>Getränke / Verzehr-Wertbons ausstellen:</strong></label>
             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
@@ -898,11 +898,11 @@
                 </div>
             </div>
 
-            <!-- WERTBON-KONFIGURATION / MANUELLE AUSWAHL (NUR INHABER) -->
+            <!-- WERTBON-KONFIGURATION -->
             <div id="tab-wertbon-config" class="tab-pane">
                 <div class="inhaber-section highlight-card">
                     <h4>⚙️ Manuelle Auswahl: Wertbon-Zusammenstellung (10€ / 15€ / 20€)</h4>
-                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Legen Sie hier im Inhaber-Bereich fest, mit welchen Standard-Stückelungen die Wertbons (10 €, 15 €, 20 €) erstellt werden sollen[cite: 1].</p>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Legen Sie hier im Inhaber-Bereich fest, mit welchen Standard-Stückelungen die Wertbons erstellt werden sollen[cite: 1].</p>
                     
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
                         <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
@@ -962,8 +962,12 @@
                             </select>
                         </div>
                         <div>
-                            <label for="neue-farbe">Button-Farbe</label>
+                            <label for="neue-farbe">Button-Farbe (wenn kein Bild)</label>
                             <input type="color" id="neue-farbe" value="#2563eb" style="width:100%; height:38px; border:1px solid var(--border-color); border-radius:8px; padding:2px;">
+                        </div>
+                        <div class="span-2">
+                            <label for="neues-bild">Hintergrundbild (URL) [optional]</label>
+                            <input type="text" id="neues-bild" placeholder="https://beispiel.de/bild.jpg (leer lassen für reine Farbe)">
                         </div>
                     </div>
                     <div style="margin-top: 15px; display: flex; gap: 10px;">
@@ -1044,20 +1048,31 @@
 </div>
 
 <script>
+    // Standardprodukte inklusive Ihrer Wunsch-Getränke-Liste
     let produkte = JSON.parse(localStorage.getItem('kasse_produkte')) || [
-        { id: 1, name: 'Bier 0,5l', preis: 3.50, einkauf: 1.80, kategorie: 'getraenke', farbe: '#b45309' },
-        { id: 2, name: 'Radler 0,5l', preis: 3.50, einkauf: 1.80, kategorie: 'getraenke', farbe: '#d97706' },
-        { id: 3, name: 'Wasser 0,5l', preis: 2.00, einkauf: 0.80, kategorie: 'getraenke', farbe: '#2563eb' },
-        { id: 4, name: 'Cola / Limo', preis: 2.50, einkauf: 1.00, kategorie: 'getraenke', farbe: '#dc2626' },
-        { id: 5, name: 'Wurstsalat', preis: 6.50, einkauf: 3.20, kategorie: 'verzehr', farbe: '#16a34a' },
-        { id: 6, name: 'Currywurst', preis: 4.50, einkauf: 2.10, kategorie: 'verzehr', farbe: '#ca8a04' },
-        { id: 7, name: 'Pommes frites', preis: 3.00, einkauf: 1.10, kategorie: 'verzehr', farbe: '#9333ea' }
+        { id: 1, name: '1/2 Bier', preis: 3.80, einkauf: 1.80, kategorie: 'getraenke', farbe: '#b45309', bild: '' },
+        { id: 2, name: 'Weizenbier', preis: 4.00, einkauf: 1.90, kategorie: 'getraenke', farbe: '#d97706', bild: '' },
+        { id: 3, name: '1/4 Schorle weiss (süß)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#ca8a04', bild: '' },
+        { id: 4, name: '1/4 Schorle rot (süß)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#991b1b', bild: '' },
+        { id: 5, name: '1/4 Schorle rose (süß)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#db2777', bild: '' },
+        { id: 6, name: '1/4 Schorle weiss (sauer)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#ca8a04', bild: '' },
+        { id: 7, name: '1/4 Schorle rot (sauer)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#991b1b', bild: '' },
+        { id: 8, name: '1/4 Schorle rose (sauer)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#db2777', bild: '' },
+        { id: 9, name: '1/2 Schorle weiss (sauer)', preis: 4.50, einkauf: 2.00, kategorie: 'getraenke', farbe: '#ca8a04', bild: '' },
+        { id: 10, name: '1/2 Schorle rot (sauer)', preis: 4.50, einkauf: 2.00, kategorie: 'getraenke', farbe: '#991b1b', bild: '' },
+        { id: 11, name: '1/2 Schorle rose (sauer)', preis: 4.50, einkauf: 2.00, kategorie: 'getraenke', farbe: '#db2777', bild: '' },
+        { id: 12, name: 'Sprudel sauer/süß', preis: 2.00, einkauf: 0.80, kategorie: 'getraenke', farbe: '#2563eb', bild: '' },
+        { id: 13, name: 'Cola', preis: 2.50, einkauf: 1.00, kategorie: 'getraenke', farbe: '#dc2626', bild: '' },
+        { id: 14, name: 'Fanta', preis: 2.50, einkauf: 1.00, kategorie: 'getraenke', farbe: '#ea580c', bild: '' },
+        { id: 15, name: 'Kaffee', preis: 2.00, einkauf: 0.70, kategorie: 'getraenke', farbe: '#78350f', bild: '' },
+        { id: 16, name: 'Flasche Sekt', preis: 12.00, einkauf: 6.50, kategorie: 'getraenke', farbe: '#059669', bild: '' },
+        { id: 17, name: 'Currywurst', preis: 4.50, einkauf: 2.10, kategorie: 'verzehr', farbe: '#ca8a04', bild: '' },
+        { id: 18, name: 'Pommes frites', preis: 3.00, einkauf: 1.10, kategorie: 'verzehr', farbe: '#9333ea', bild: '' }
     ];
 
     let helferListe = JSON.parse(localStorage.getItem('kasse_helfer')) || ['Max Mustermann', 'Erika Musterfrau', 'Hans Dampf'];
     let anfangsbestand = parseFloat(localStorage.getItem('kasse_anfangsbestand')) || 100.00;
     
-    // Gespeicherte Wertbon-Konfigurationen laden oder Standard setzen
     let wertbonConfig = JSON.parse(localStorage.getItem('kasse_wertbon_config')) || {
         p10: 'standard',
         p15: 'standard',
@@ -1077,7 +1092,6 @@
         aktualisiereAnzeige();
         document.getElementById('input-wechselgeld').value = anfangsbestand.toFixed(2);
         
-        // Dropdowns im Inhaber-Bereich mit gespeicherten Werten initialisieren
         if(document.getElementById('preset-10')) document.getElementById('preset-10').value = wertbonConfig.p10;
         if(document.getElementById('preset-15')) document.getElementById('preset-15').value = wertbonConfig.p15;
         if(document.getElementById('preset-20')) document.getElementById('preset-20').value = wertbonConfig.p20;
@@ -1110,7 +1124,13 @@
             
             const btn = document.createElement('button');
             btn.className = 'btn-produkt';
-            btn.style.backgroundColor = p.farbe || '#2563eb';
+            
+            if (p.bild && p.bild.trim() !== '') {
+                btn.style.backgroundImage = `url('${p.bild}')`;
+            } else {
+                btn.style.backgroundColor = p.farbe || '#2563eb';
+            }
+
             btn.onclick = () => fuegeZumWarenkorbHinzu(p);
 
             btn.innerHTML = `
@@ -1216,7 +1236,6 @@
         bonDrucken();
     }
 
-    // Wertbons mit dynamischer Stückelung basierend auf der Inhaber-Konfiguration
     function druckeWertGetraenkeBon(gesamtwert) {
         let preset = 'standard';
         if (gesamtwert === 10) preset = wertbonConfig.p10;
@@ -1644,6 +1663,7 @@
         const einkauf = parseFloat(document.getElementById('neuer-einkaufspreis').value) || 0;
         const kategorie = document.getElementById('neue-kategorie').value;
         const farbe = document.getElementById('neue-farbe').value;
+        const bild = document.getElementById('neues-bild').value.trim();
 
         if (!name || isNaN(preis)) {
             alert('Bitte geben Sie einen Produktnamen und einen gültigen Preis ein.');
@@ -1658,6 +1678,7 @@
                 p.einkauf = einkauf;
                 p.kategorie = kategorie;
                 p.farbe = farbe;
+                p.bild = bild;
             }
         } else {
             const neuesProdukt = {
@@ -1666,7 +1687,8 @@
                 preis,
                 einkauf,
                 kategorie,
-                farbe
+                farbe,
+                bild
             };
             produkte.push(neuesProdukt);
         }
@@ -1685,6 +1707,7 @@
             document.getElementById('neuer-einkaufspreis').value = p.einkauf || '';
             document.getElementById('neue-kategorie').value = p.kategorie;
             document.getElementById('neue-farbe').value = p.farbe || '#2563eb';
+            document.getElementById('neues-bild').value = p.bild || '';
             document.getElementById('btn-produkt-abbrechen').style.display = 'block';
         }
     }
@@ -1702,6 +1725,7 @@
         document.getElementById('neuer-name').value = '';
         document.getElementById('neuer-preis').value = '';
         document.getElementById('neuer-einkaufspreis').value = '';
+        document.getElementById('neues-bild').value = '';
         document.getElementById('btn-produkt-abbrechen').style.display = 'none';
     }
 
@@ -1836,7 +1860,7 @@
             let zeit = new Date(t.zeitpunkt).toLocaleTimeString('de-DE');
             let art = t.istHelfer ? "Helfer-Ausgabe" : (t.istWertBon ? "Getränke/Verzehr-Wertbon" : "Verkauf");
             let helfer = t.helferName || "-";
-            let betrag = t.gesamt.getvalue ? t.gesamt.toFixed(2).replace('.', ',') : t.gesamt.toFixed(2).replace('.', ',');
+            let betrag = t.gesamt.toFixed(2).replace('.', ',');
             csvContent += `${t.id};${zeit};${art};${helfer};${betrag}\n`;
         });
 
