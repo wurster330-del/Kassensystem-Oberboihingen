@@ -57,12 +57,19 @@
             align-items: flex-start;
         }
 
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+
         .kasse-panel {
             flex: 1;
             background: var(--card-bg);
             padding: 24px;
             border-radius: var(--radius);
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
+            width: 100%;
         }
 
         .produkte-header {
@@ -97,6 +104,12 @@
             gap: 12px;
             margin-bottom: 15px;
             min-height: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         .btn-produkt {
@@ -319,6 +332,13 @@
             border: 1px solid var(--border-color);
             position: sticky;
             top: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .bon-container {
+                width: 100%;
+                position: static;
+            }
         }
 
         #bon-bereich {
@@ -545,6 +565,12 @@
             gap: 16px;
         }
 
+        @media (max-width: 768px) {
+            .inhaber-grid-2col {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .tagesabschluss-vorschau-tabelle, .produkt-verwaltungs-tabelle {
             width: 100%;
             border-collapse: collapse;
@@ -673,6 +699,7 @@
     <div class="kasse-panel">
         <div class="produkte-header">
             <h2>Produkte</h2>
+            <button class="btn-schein" style="background:#f8fafc; font-size:12px; padding:6px 10px;" onclick="erzwingeStandardProdukteReset()">🔄 Standard-Produkte wiederherstellen</button>
         </div>
 
         <div class="kategorie-titel">🍺 Getränke</div>
@@ -765,10 +792,8 @@
     </div>
 </div>
 
-<!-- Druckansicht Overlay -->
 <div id="druck-ansicht-overlay"></div>
 
-<!-- Modal Dialog: Inhaber-Bereich -->
 <div class="modal-overlay" id="inhaber-modal">
     <div class="modal-card inhaber-wide">
         <div class="inhaber-header">
@@ -902,7 +927,7 @@
             <div id="tab-wertbon-config" class="tab-pane">
                 <div class="inhaber-section highlight-card">
                     <h4>⚙️ Manuelle Auswahl: Wertbon-Zusammenstellung (10€ / 15€ / 20€)</h4>
-                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Legen Sie hier im Inhaber-Bereich fest, mit welchen Standard-Stückelungen die Wertbons erstellt werden sollen[cite: 1].</p>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Legen Sie hier im Inhaber-Bereich fest, mit welchen Standard-Stückelungen die Wertbons erstellt werden sollen.</p>
                     
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
                         <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
@@ -1024,7 +1049,6 @@
     </div>
 </div>
 
-<!-- Modal: Helfer-Auswahl -->
 <div class="modal-overlay" id="helfer-auswahl-modal">
     <div class="modal-card">
         <h3>🎁 Helfer-Ausgabe auswählen</h3>
@@ -1038,7 +1062,7 @@
             </div>
         </div>
 
-        <label style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">Oder Helfer für Warenkorb-Artikel zuweisen:</label>
+        <label style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">Oder Helfer for Warenkorb-Artikel zuweisen:</label>
         <div id="helfer-auswahl-grid-container" class="helfer-auswahl-grid"></div>
 
         <div class="modal-actions">
@@ -1048,8 +1072,8 @@
 </div>
 
 <script>
-    // Standardprodukte inklusive Ihrer Wunsch-Getränke-Liste
-    let produkte = JSON.parse(localStorage.getItem('kasse_produkte')) || [
+    // Definitive Standardprodukte (Getränke & Verzehr)
+    const STANDARD_PRODUKTE = [
         { id: 1, name: '1/2 Bier', preis: 3.80, einkauf: 1.80, kategorie: 'getraenke', farbe: '#b45309', bild: '' },
         { id: 2, name: 'Weizenbier', preis: 4.00, einkauf: 1.90, kategorie: 'getraenke', farbe: '#d97706', bild: '' },
         { id: 3, name: '1/4 Schorle weiss (süß)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#ca8a04', bild: '' },
@@ -1070,6 +1094,7 @@
         { id: 18, name: 'Pommes frites', preis: 3.00, einkauf: 1.10, kategorie: 'verzehr', farbe: '#9333ea', bild: '' }
     ];
 
+    let produkte = ladeUndSynchronisiereProdukte();
     let helferListe = JSON.parse(localStorage.getItem('kasse_helfer')) || ['Max Mustermann', 'Erika Musterfrau', 'Hans Dampf'];
     let anfangsbestand = parseFloat(localStorage.getItem('kasse_anfangsbestand')) || 100.00;
     
@@ -1085,6 +1110,53 @@
     let istHelferAusgabe = false;
     let aktuellerHelfer = '';
     let aktuellerBearbeitungsBon = null;
+
+    // Automatischer Abgleich beim Laden: Garantiert, dass Standard-Getränke/Verzehr vorhanden sind, ohne benutzerdefinierte Änderungen zu löschen
+    function ladeUndSynchronisiereProdukte() {
+        let gespeicherteProdukte = [];
+        try {
+            gespeicherteProdukte = JSON.parse(localStorage.getItem('kasse_produkte')) || [];
+        } catch (e) {
+            gespeicherteProdukte = [];
+        }
+
+        // Falls gar nichts im Speicher ist, Standard setzen
+        if (!Array.isArray(gespeicherteProdukte) || gespeicherteProdukte.length === 0) {
+            localStorage.setItem('kasse_produkte', JSON.stringify(STANDARD_PRODUKTE));
+            return [...STANDARD_PRODUKTE];
+        }
+
+        // Abgleich: Prüfe ob Getränke-Kategorie überhaupt existiert. Falls z.B. nur Müll im LocalStorage lag, ergänzen wir Standard-Produkte.
+        let hatGetraenke = gespeicherteProdukte.some(p => p.kategorie === 'getraenke');
+        if (!hatGetraenke) {
+            // Kombiniere bestehende mit Standard-Produkten
+            let kombiniert = [...STANDARD_PRODUKTE];
+            gespeicherteProdukte.forEach(gp => {
+                if (!kombiniert.some(sp => sp.name.toLowerCase() === gp.name.toLowerCase())) {
+                    kombiniert.push(gp);
+                }
+            });
+            localStorage.setItem('kasse_produkte', JSON.stringify(kombiniert));
+            return kombiniert;
+        }
+
+        return gespeicherteProdukte;
+    }
+
+    function erzwingeStandardProdukteReset() {
+        if (confirm('Möchten Sie alle Standard-Getränke und Verzehrprodukte frisch laden? Eigene manuelle Produkte bleiben erhalten.')) {
+            let aktuell = JSON.parse(localStorage.getItem('kasse_produkte')) || [];
+            STANDARD_PRODUKTE.forEach(sp => {
+                if (!aktuell.some(a => a.name.toLowerCase() === sp.name.toLowerCase())) {
+                    aktuell.push(sp);
+                }
+            });
+            produkte = aktuell;
+            localStorage.setItem('kasse_produkte', JSON.stringify(produkte));
+            renderProdukte();
+            alert('Standard-Produkte wurden erfolgreich aktualisiert und angezeigt!');
+        }
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         aktualisiereDatum();
@@ -1115,6 +1187,8 @@
     function renderProdukte() {
         const gridGetraenke = document.getElementById('grid-getraenke');
         const gridVerzehr = document.getElementById('grid-verzehr');
+        if (!gridGetraenke || !gridVerzehr) return;
+
         gridGetraenke.innerHTML = '';
         gridVerzehr.innerHTML = '';
 
@@ -1731,6 +1805,7 @@
 
     function renderProdukteVerwaltungTabelle() {
         const tab = document.getElementById('tabelle-produkte-verwaltung');
+        if (!tab) return;
         tab.innerHTML = `<tr><th>Produkt</th><th>Kat.</th><th>Preis</th><th style="text-align: right;">Aktion</th></tr>`;
         produkte.forEach(p => {
             tab.innerHTML += `
@@ -1797,6 +1872,7 @@
 
     function renderHelferListe() {
         const container = document.getElementById('helfer-liste-container');
+        if (!container) return;
         container.innerHTML = '';
         helferListe.forEach(h => {
             container.innerHTML += `
