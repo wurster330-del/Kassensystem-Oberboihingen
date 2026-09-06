@@ -664,6 +664,30 @@
             background: #e2e8f0;
         }
 
+        /* NEU: Styling für die visuellen Wertbon-Auswahlkarten */
+        .btn-config-option {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 8px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            color: var(--text-main);
+            transition: all 0.15s ease;
+        }
+        .btn-config-option:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+        .btn-config-option.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary-hover);
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        }
+
         @media print {
             body * {
                 visibility: hidden !important;
@@ -926,40 +950,70 @@
                 </div>
             </div>
 
-            <!-- WERTBON-KONFIGURATION -->
+            <!-- WERTBON-KONFIGURATION (NEU GESTALTET) -->
             <div id="tab-wertbon-config" class="tab-pane">
                 <div class="inhaber-section highlight-card">
-                    <h4>⚙️ Manuelle Auswahl: Wertbon-Zusammenstellung (10€ / 15€ / 20€)</h4>
-                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Legen Sie hier im Inhaber-Bereich fest, mit welchen Standard-Stückelungen die Wertbons erstellt werden sollen.</p>
+                    <h4>⚙️ Visuelle Wertbon-Zusammenstellung</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Legen Sie fest, wie die Stückelungen für die jeweiligen Bon-Werte (10 €, 15 €, 20 €) aufgebaut sein sollen. Wählen Sie einfach per Klick das gewünschte Profil aus:</p>
                     
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
-                        <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
-                            <label for="preset-10"><strong>10 € Bon Zusammenstellung:</strong></label>
-                            <select id="preset-10" class="btn-schein" style="width: 100%; background: white; font-size: 13px; padding: 8px; margin-top: 8px;">
-                                <option value="standard">Standard (Misch)</option>
-                                <option value="nur_klein">Nur kleine Werte (≤2€)</option>
-                                <option value="50cent">Viele 50-Cent-Bons</option>
-                            </select>
+                        <!-- 10 Euro Bon -->
+                        <div style="background: white; padding: 14px; border-radius: 8px; border: 2px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between;" id="card-config-10">
+                            <div>
+                                <div style="font-weight: 800; font-size: 15px; color: var(--primary); margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">10 € Bon</div>
+                                <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+                                    <button type="button" class="btn-config-option" data-wert="10" data-preset="standard" onclick="sätzeWertbonPreset(10, 'standard')">
+                                        ⭐ Standard Mix (2€, 1€, 0.50€)
+                                    </button>
+                                    <button type="button" class="btn-config-option" data-wert="10" data-preset="nur_50cent" onclick="sätzeWertbonPreset(10, 'nur_50cent')">
+                                        🪙 Viele kleine Werte (50ct/1€)
+                                    </button>
+                                    <button type="button" class="btn-config-option" data-wert="10" data-preset="nur_2eur" onclick="sätzeWertbonPreset(10, 'nur_2eur')">
+                                        💶 Fokus auf 2-Euro Stücke
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
-                            <label for="preset-15"><strong>15 € Bon Zusammenstellung:</strong></label>
-                            <select id="preset-15" class="btn-schein" style="width: 100%; background: white; font-size: 13px; padding: 8px; margin-top: 8px;">
-                                <option value="standard">Standard (Misch)</option>
-                                <option value="nur_klein">Nur kleine Werte (≤2€)</option>
-                                <option value="grosse_stuecke">Mehr 5-Euro-Stücke</option>
-                            </select>
+
+                        <!-- 15 Euro Bon -->
+                        <div style="background: white; padding: 14px; border-radius: 8px; border: 2px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between;" id="card-config-15">
+                            <div>
+                                <div style="font-weight: 800; font-size: 15px; color: var(--primary); margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">15 € Bon</div>
+                                <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+                                    <button type="button" class="btn-config-option" data-wert="15" data-preset="standard" onclick="sätzeWertbonPreset(15, 'standard')">
+                                        ⭐ Standard Mix (5€, 2€, etc.)
+                                    </button>
+                                    <button type="button" class="btn-config-option" data-wert="15" data-preset="nur_50cent" onclick="sätzeWertbonPreset(15, 'nur_50cent')">
+                                        🪙 Viele kleine Werte (50ct)
+                                    </button>
+                                    <button type="button" class="btn-config-option" data-wert="15" data-preset="nur_5eur" onclick="sätzeWertbonPreset(15, 'nur_5eur')">
+                                        💵 Große Scheine (3x 5€)
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
-                            <label for="preset-20"><strong>20 € Bon Zusammenstellung:</strong></label>
-                            <select id="preset-20" class="btn-schein" style="width: 100%; background: white; font-size: 13px; padding: 8px; margin-top: 8px;">
-                                <option value="standard">Standard (Misch)</option>
-                                <option value="nur_5er">Viel 5 € & 2 €</option>
-                                <option value="50cent">Mit vielen 50-Cent-Bons</option>
-                            </select>
+
+                        <!-- 20 Euro Bon -->
+                        <div style="background: white; padding: 14px; border-radius: 8px; border: 2px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between;" id="card-config-20">
+                            <div>
+                                <div style="font-weight: 800; font-size: 15px; color: var(--primary); margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">20 € Bon</div>
+                                <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+                                    <button type="button" class="btn-config-option" data-wert="20" data-preset="standard" onclick="sätzeWertbonPreset(20, 'standard')">
+                                        ⭐ Standard Mix (5€, 2€, 1€)
+                                    </button>
+                                    <button type="button" class="btn-config-option" data-wert="20" data-preset="nur_50cent" onclick="sätzeWertbonPreset(20, 'nur_50cent')">
+                                        🪙 Viele kleine Werte (50ct)
+                                    </button>
+                                    <button type="button" class="btn-config-option" data-wert="20" data-preset="nur_5eur" onclick="sätzeWertbonPreset(20, 'nur_5eur')">
+                                        💵 Maximale Großwerte (4x 5€)
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div style="margin-top: 20px;">
-                        <button class="btn-action btn-modal-save" onclick="speichereWertbonKonfiguration()">Konfiguration speichern</button>
+
+                    <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                        <button class="btn-action btn-modal-save" style="width: auto; padding: 12px 24px;" onclick="speichereWertbonKonfiguration()">💾 Konfiguration sichern</button>
                     </div>
                 </div>
             </div>
@@ -1163,17 +1217,31 @@
         aktualisiereAnzeige();
         document.getElementById('input-wechselgeld').value = anfangsbestand.toFixed(2);
         
-        if(document.getElementById('preset-10')) document.getElementById('preset-10').value = wertbonConfig.p10;
-        if(document.getElementById('preset-15')) document.getElementById('preset-15').value = wertbonConfig.p15;
-        if(document.getElementById('preset-20')) document.getElementById('preset-20').value = wertbonConfig.p20;
+        aktualisiereWertbonConfigUI();
 
         setInterval(aktualisiereDatum, 1000);
     });
 
+    function sätzeWertbonPreset(wert, presetName) {
+        wertbonConfig['p' + wert] = presetName;
+        aktualisiereWertbonConfigUI();
+    }
+
+    function aktualisiereWertbonConfigUI() {
+        ['10', '15', '20'].forEach(wert => {
+            const aktPreset = wertbonConfig['p' + wert] || 'standard';
+            const buttons = document.querySelectorAll(`.btn-config-option[data-wert="${wert}"]`);
+            buttons.forEach(btn => {
+                if (btn.getAttribute('data-preset') === aktPreset) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        });
+    }
+
     function speichereWertbonKonfiguration() {
-        wertbonConfig.p10 = document.getElementById('preset-10').value;
-        wertbonConfig.p15 = document.getElementById('preset-15').value;
-        wertbonConfig.p20 = document.getElementById('preset-20').value;
         localStorage.setItem('kasse_wertbon_config', JSON.stringify(wertbonConfig));
         alert('Wertbon-Konfiguration erfolgreich im Inhaber-Bereich gespeichert!');
     }
@@ -1320,21 +1388,11 @@
         let positionen = [];
 
         if (gesamtwert === 10) {
-            if (preset === 'nur_klein') {
+            if (preset === 'nur_50cent') {
                 positionen = [
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
                     { wert: 1.00, text: '1,00 €', eingelost: false },
                     { wert: 1.00, text: '1,00 €', eingelost: false },
                     { wert: 1.00, text: '1,00 €', eingelost: false },
-                    { wert: 0.50, text: '0,50 €', eingelost: false },
-                    { wert: 0.50, text: '0,50 €', eingelost: false }
-                ];
-            } else if (preset === '50cent') {
-                positionen = [
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
                     { wert: 1.00, text: '1,00 €', eingelost: false },
                     { wert: 0.50, text: '0,50 €', eingelost: false },
                     { wert: 0.50, text: '0,50 €', eingelost: false },
@@ -1346,6 +1404,14 @@
                     { wert: 0.50, text: '0,50 €', eingelost: false },
                     { wert: 0.50, text: '0,50 €', eingelost: false },
                     { wert: 0.50, text: '0,50 €', eingelost: false }
+                ];
+            } else if (preset === 'nur_2eur') {
+                positionen = [
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false },
+                    { wert: 2.00, text: '2,00 €', eingelost: false }
                 ];
             } else {
                 positionen = [
@@ -1362,29 +1428,35 @@
                 ];
             }
         } else if (gesamtwert === 15) {
-            if (preset === 'nur_klein') {
+            if (preset === 'nur_50cent') {
                 positionen = [
                     { wert: 2.00, text: '2,00 €', eingelost: false },
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
                     { wert: 1.00, text: '1,00 €', eingelost: false },
                     { wert: 1.00, text: '1,00 €', eingelost: false },
-                    { wert: 1.00, text: '1,00 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
+                    { wert: 0.50, text: '0,50 €', eingelost: false },
                     { wert: 0.50, text: '0,50 €', eingelost: false },
                     { wert: 0.50, text: '0,50 €', eingelost: false },
                     { wert: 0.50, text: '0,50 €', eingelost: false },
                     { wert: 0.50, text: '0,50 €', eingelost: false }
                 ];
-            } else if (preset === 'grosse_stuecke') {
+            } else if (preset === 'nur_5eur') {
                 positionen = [
                     { wert: 5.00, text: '5,00 €', eingelost: false },
                     { wert: 5.00, text: '5,00 €', eingelost: false },
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
-                    { wert: 0.50, text: '0,50 €', eingelost: false },
-                    { wert: 0.50, text: '0,50 €', eingelost: false }
+                    { wert: 5.00, text: '5,00 €', eingelost: false }
                 ];
             } else {
                 positionen = [
@@ -1399,29 +1471,15 @@
                 ];
             }
         } else if (gesamtwert === 20) {
-            if (preset === 'nur_5er') {
+            if (preset === 'nur_50cent') {
+                positionen = [];
+                for(let i=0; i<40; i++) positionen.push({ wert: 0.50, text: '0,50 €', eingelost: false });
+            } else if (preset === 'nur_5eur') {
                 positionen = [
                     { wert: 5.00, text: '5,00 €', eingelost: false },
                     { wert: 5.00, text: '5,00 €', eingelost: false },
                     { wert: 5.00, text: '5,00 €', eingelost: false },
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
-                    { wert: 1.00, text: '1,00 €', eingelost: false }
-                ];
-            } else if (preset === '50cent') {
-                positionen = [
-                    { wert: 5.00, text: '5,00 €', eingelost: false },
-                    { wert: 5.00, text: '5,00 €', eingelost: false },
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
-                    { wert: 2.00, text: '2,00 €', eingelost: false },
-                    { wert: 0.50, text: '0,50 €', eingelost: false },
-                    { wert: 0.50, text: '0,50 €', eingelost: false },
-                    { wert: 0.50, text: '0,50 €', eingelost: false },
-                    { wert: 0.50, text: '0,50 €', eingelost: false },
-                    { wert: 0.50, text: '0,50 €', eingelost: false },
-                    { wert: 0.50, text: '0,50 €', eingelost: false },
-                    { wert: 0.50, text: '0,50 €', eingelost: false },
-                    { wert: 0.50, text: '0,50 €', eingelost: false }
+                    { wert: 5.00, text: '5,00 €', eingelost: false }
                 ];
             } else {
                 positionen = [
@@ -1679,6 +1737,7 @@
     function oefneInhaberBereich() {
         aktualisiereTagesabschlussVorschau();
         aktualisiereOffeneWertbonsTabelle();
+        aktualisiereWertbonConfigUI();
         document.getElementById('inhaber-modal').classList.add('active');
     }
 
@@ -1693,6 +1752,7 @@
         if (event) event.currentTarget.classList.add('active');
         if (tabId === 'tab-tagesabschluss') aktualisiereTagesabschlussVorschau();
         if (tabId === 'tab-wertbons') aktualisiereOffeneWertbonsTabelle();
+        if (tabId === 'tab-wertbon-config') aktualisiereWertbonConfigUI();
         if (tabId === 'tab-helfer') renderHelferListe();
     }
 
@@ -1724,7 +1784,7 @@
                     if (item.kategorie === 'getraenke' || item.kategorie === 'wertbon') umsatzGetraenke += item.preis;
                     if (item.kategorie === 'verzehr') umsatzVerzehr += item.preis;
                     if (item.kategorie === 'auszahlung') {
-                        umsatzGetraenke += item.preis; // Zieht den Auszahlungsbetrag vom Gesamtumsatz ab
+                        umsatzGetraenke += item.preis;
                     }
                     
                     const einkauf = item.einkauf || 0;
