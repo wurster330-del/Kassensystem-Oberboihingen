@@ -896,7 +896,7 @@
             <div id="tab-wertbons" class="tab-pane">
                 <div class="inhaber-section highlight-card">
                     <h4>🎟️ Aktive Wertbons prüfen & Positionen abstreichen</h4>
-                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Geben Sie die Bon-ID ein oder wählen Sie einen ausgegebenen Bon aus, um Einzelwerte beim Einlösen abzuhaken.</p>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">Geben Sie die Bon-ID ein oder wählen Sie einen ausgegebenen Bon aus, um Einzelwerte beim Einlösen abzuhaken oder den Restbetrag auszubezahlen.</p>
                     
                     <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                         <input type="text" id="such-bon-id" placeholder="Bon-ID eingeben..." style="flex:1;">
@@ -907,7 +907,10 @@
                         <h5 id="wb-titel" style="margin-top:0; font-size:15px; color:var(--primary);">Bon Details</h5>
                         <p id="wb-info" style="font-size: 13px; color: var(--text-muted);"></p>
                         <div id="wb-positionen-liste" style="margin: 15px 0;"></div>
-                        <button class="btn-action btn-modal-save" onclick="speichereWertbonEinloesung()">Ausgewählte Positionen entwerten / verbuchen</button>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-action btn-modal-save" style="flex: 1;" onclick="speichereWertbonEinloesung()">Ausgewählte Positionen entwerten</button>
+                            <button class="btn-action" style="flex: 1; background-color: var(--warning);" onclick="auszahlenRestwertBon()">Restbetrag ausbezahlen</button>
+                        </div>
                     </div>
 
                     <h4 style="margin-top: 20px; font-size: 14px;">Liste aller offenen Wertbons</h4>
@@ -1055,14 +1058,14 @@
         <p style="font-size: 13px; color: var(--text-muted);">Wählen Sie einen Helfer für die Artikel im Warenkorb oder direkt einen reinen Kategorie-Bon:</p>
         
         <div style="background: #f8fafc; border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-            <label style="margin-top:0; font-size:12px; color:var(--text-muted);">Schnell-Bon ohne Artikelausgabe drucken:</label>
+            <label style="margin-top:0; font-size:12px; color:var(--text-muted);">Schnell-Bon ohne Artikelauswahl drucken:</label>
             <div style="display: flex; gap: 10px; margin-top: 8px;">
                 <button class="btn-action btn-modal-save" style="background-color:#d97706; flex:1;" onclick="druckeDirektKategorieBon('Getränke')">🍺 Nur Getränke</button>
                 <button class="btn-action btn-modal-save" style="background-color:#16a34a; flex:1;" onclick="druckeDirektKategorieBon('Verzehr')">🍔 Nur Verzehr</button>
             </div>
         </div>
 
-        <label style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">Oder Helfer for Warenkorb-Artikel zuweisen:</label>
+        <label style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">Oder Helfer für Warenkorb-Artikel zuweisen:</label>
         <div id="helfer-auswahl-grid-container" class="helfer-auswahl-grid"></div>
 
         <div class="modal-actions">
@@ -1072,23 +1075,26 @@
 </div>
 
 <script>
-    // Aktualisierte Standardprodukte (Getränke & Verzehr) ohne die entfernten Varianten
+    // Definitive Standardprodukte (Getränke & Verzehr)
     const STANDARD_PRODUKTE = [
         { id: 1, name: '1/2 Bier', preis: 3.80, einkauf: 1.80, kategorie: 'getraenke', farbe: '#b45309', bild: '' },
         { id: 2, name: 'Weizenbier', preis: 4.00, einkauf: 1.90, kategorie: 'getraenke', farbe: '#d97706', bild: '' },
         { id: 3, name: '1/4 Schorle weiss (süß)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#ca8a04', bild: '' },
-        { id: 4, name: '1/4 Schorle rose (süß)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#db2777', bild: '' },
-        { id: 5, name: '1/4 Schorle rot (süß)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#991b1b', bild: '' },
+        { id: 4, name: '1/4 Schorle rot (süß)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#991b1b', bild: '' },
+        { id: 5, name: '1/4 Schorle rose (süß)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#db2777', bild: '' },
         { id: 6, name: '1/4 Schorle weiss (sauer)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#ca8a04', bild: '' },
-        { id: 7, name: '1/4 Schorle rose (sauer)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#db2777', bild: '' },
-        { id: 8, name: '1/4 Schorle rot (sauer)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#991b1b', bild: '' },
-        { id: 9, name: 'Sprudel sauer/süß', preis: 2.00, einkauf: 0.80, kategorie: 'getraenke', farbe: '#2563eb', bild: '' },
-        { id: 10, name: 'Cola', preis: 2.50, einkauf: 1.00, kategorie: 'getraenke', farbe: '#dc2626', bild: '' },
-        { id: 11, name: 'Fanta', preis: 2.50, einkauf: 1.00, kategorie: 'getraenke', farbe: '#ea580c', bild: '' },
-        { id: 12, name: 'Kaffee', preis: 2.00, einkauf: 0.70, kategorie: 'getraenke', farbe: '#78350f', bild: '' },
-        { id: 13, name: 'Flasche Sekt', preis: 12.00, einkauf: 6.50, kategorie: 'getraenke', farbe: '#059669', bild: '' },
-        { id: 14, name: 'Currywurst', preis: 4.50, einkauf: 2.10, kategorie: 'verzehr', farbe: '#ca8a04', bild: '' },
-        { id: 15, name: 'Pommes frites', preis: 3.00, einkauf: 1.10, kategorie: 'verzehr', farbe: '#9333ea', bild: '' }
+        { id: 7, name: '1/4 Schorle rot (sauer)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#991b1b', bild: '' },
+        { id: 8, name: '1/4 Schorle rose (sauer)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#db2777', bild: '' },
+        { id: 9, name: '1/2 Schorle weiss (sauer)', preis: 4.50, einkauf: 2.00, kategorie: 'getraenke', farbe: '#ca8a04', bild: '' },
+        { id: 10, name: '1/2 Schorle rot (sauer)', preis: 4.50, einkauf: 2.00, kategorie: 'getraenke', farbe: '#991b1b', bild: '' },
+        { id: 11, name: '1/2 Schorle rose (sauer)', preis: 4.50, einkauf: 2.00, kategorie: 'getraenke', farbe: '#db2777', bild: '' },
+        { id: 12, name: 'Sprudel sauer/süß', preis: 2.00, einkauf: 0.80, kategorie: 'getraenke', farbe: '#2563eb', bild: '' },
+        { id: 13, name: 'Cola', preis: 2.50, einkauf: 1.00, kategorie: 'getraenke', farbe: '#dc2626', bild: '' },
+        { id: 14, name: 'Fanta', preis: 2.50, einkauf: 1.00, kategorie: 'getraenke', farbe: '#ea580c', bild: '' },
+        { id: 15, name: 'Kaffee', preis: 2.00, einkauf: 0.70, kategorie: 'getraenke', farbe: '#78350f', bild: '' },
+        { id: 16, name: 'Flasche Sekt', preis: 12.00, einkauf: 6.50, kategorie: 'getraenke', farbe: '#059669', bild: '' },
+        { id: 17, name: 'Currywurst', preis: 4.50, einkauf: 2.10, kategorie: 'verzehr', farbe: '#ca8a04', bild: '' },
+        { id: 18, name: 'Pommes frites', preis: 3.00, einkauf: 1.10, kategorie: 'verzehr', farbe: '#9333ea', bild: '' }
     ];
 
     let produkte = ladeUndSynchronisiereProdukte();
@@ -1108,7 +1114,6 @@
     let aktuellerHelfer = '';
     let aktuellerBearbeitungsBon = null;
 
-    // Automatischer Abgleich beim Laden
     function ladeUndSynchronisiereProdukte() {
         let gespeicherteProdukte = [];
         try {
@@ -1122,33 +1127,33 @@
             return [...STANDARD_PRODUKTE];
         }
 
+        let hatGetraenke = gespeicherteProdukte.some(p => p.kategorie === 'getraenke');
+        if (!hatGetraenke) {
+            let kombiniert = [...STANDARD_PRODUKTE];
+            gespeicherteProdukte.forEach(gp => {
+                if (!kombiniert.some(sp => sp.name.toLowerCase() === gp.name.toLowerCase())) {
+                    kombiniert.push(gp);
+                }
+            });
+            localStorage.setItem('kasse_produkte', JSON.stringify(kombiniert));
+            return kombiniert;
+        }
+
         return gespeicherteProdukte;
     }
 
     function erzwingeStandardProdukteReset() {
-        if (confirm('Möchten Sie die Standard-Getränke und Verzehrprodukte auf die gewünschten Schorle-Varianten aktualisieren? Eigene manuelle Produkte bleiben erhalten.')) {
+        if (confirm('Möchten Sie alle Standard-Getränke und Verzehrprodukte frisch laden? Eigene manuelle Produkte bleiben erhalten.')) {
             let aktuell = JSON.parse(localStorage.getItem('kasse_produkte')) || [];
-            
-            // Entferne alte veraltete Schorlen, falls vorhanden
-            const zuEntfernen = [
-                '1/2 Schorle weiss (sauer)', '1/2 Schorle rot (sauer)', '1/2 Schorle rose (sauer)',
-                '1/4 Schorle weiss (süß)', '1/4 Schorle rot (süß)', '1/4 Schorle rose (süß)',
-                '1/4 Schorle weiss (sauer)', '1/4 Schorle rot (sauer)', '1/4 Schorle rose (sauer)'
-            ];
-            
-            aktuell = aktuell.filter(p => !zuEntfernen.includes(p.name));
-
-            // Füge neue Standard-Produkte hinzu, falls sie noch nicht existieren
             STANDARD_PRODUKTE.forEach(sp => {
                 if (!aktuell.some(a => a.name.toLowerCase() === sp.name.toLowerCase())) {
                     aktuell.push(sp);
                 }
             });
-
             produkte = aktuell;
             localStorage.setItem('kasse_produkte', JSON.stringify(produkte));
             renderProdukte();
-            alert('Standard-Produkte wurden erfolgreich aktualisiert!');
+            alert('Standard-Produkte wurden erfolgreich aktualisiert und angezeigt!');
         }
     }
 
@@ -1538,6 +1543,39 @@
         }
     }
 
+    function auszahlenRestwertBon() {
+        if (!aktuellerBearbeitungsBon) return;
+
+        const restwert = aktuellerBearbeitungsBon.restwert;
+        if (restwert <= 0) {
+            alert('Dieser Wertbon hat keinen Restbetrag mehr zur Auszahlung.');
+            return;
+        }
+
+        if (confirm(`Möchten Sie den verbleibenden Restbetrag von ${restwert.toFixed(2)} € bar ausbezahlen?`)) {
+            aktuellerBearbeitungsBon.positionen.forEach(p => p.eingelost = true);
+            
+            const auszahlungsBetrag = aktuellerBearbeitungsBon.restwert;
+            aktuellerBearbeitungsBon.restwert = 0;
+
+            tagesTransaktionen.push({
+                id: Date.now(),
+                zeitpunkt: new Date().toISOString(),
+                artikel: [{ name: `Restbetrag-Auszahlung Bon #${aktuellerBearbeitungsBon.id}`, preis: -auszahlungsBetrag, kategorie: 'auszahlung' }],
+                gesamt: -auszahlungsBetrag,
+                istHelfer: false,
+                istWertBon: false
+            });
+
+            localStorage.setItem('kasse_tages_transaktionen', JSON.stringify(tagesTransaktionen));
+            alert(`Restbetrag von ${auszahlungsBetrag.toFixed(2)} € wurde erfolgreich ausbezahlt und der Bon vollständig entwertet.`);
+            
+            sucheWertBonEinloesen();
+            aktualisiereTagesabschlussVorschau();
+            aktualisiereOffeneWertbonsTabelle();
+        }
+    }
+
     function aktualisiereOffeneWertbonsTabelle() {
         const tab = document.getElementById('offene-wertbons-tabelle');
         if (!tab) return;
@@ -1685,9 +1723,14 @@
                 t.artikel.forEach(item => {
                     if (item.kategorie === 'getraenke' || item.kategorie === 'wertbon') umsatzGetraenke += item.preis;
                     if (item.kategorie === 'verzehr') umsatzVerzehr += item.preis;
+                    if (item.kategorie === 'auszahlung') {
+                        umsatzGetraenke += item.preis; // Zieht den Auszahlungsbetrag vom Gesamtumsatz ab
+                    }
                     
                     const einkauf = item.einkauf || 0;
-                    gewinnGesamt += (item.preis - einkauf);
+                    if (item.kategorie !== 'auszahlung') {
+                        gewinnGesamt += (item.preis - einkauf);
+                    }
 
                     if (!artikelStatistik[item.name]) {
                         artikelStatistik[item.name] = { menge: 0, umsatz: 0 };
