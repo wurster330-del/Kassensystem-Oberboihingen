@@ -185,6 +185,16 @@
             text-shadow: 0px 1px 2px rgba(0,0,0,0.8);
         }
 
+        .stern-badge {
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            z-index: 3;
+            font-size: 13px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+
         .zahlungs-bereich {
             background: #fffbeb;
             border: 1px solid #fef3c7;
@@ -761,6 +771,11 @@
             <h2>Produkte</h2>
         </div>
 
+        <div id="favoriten-container-wrapper" style="display: none;">
+            <div class="kategorie-titel" style="color: #d97706;">⭐ Favoriten</div>
+            <div class="grid" id="grid-favoriten"></div>
+        </div>
+
         <div class="kategorie-titel">🍺 Getränke</div>
         <div class="grid" id="grid-getraenke"></div>
 
@@ -1052,6 +1067,10 @@
                             <label for="neues-bild">Hintergrundbild (URL) [optional]</label>
                             <input type="text" id="neues-bild" placeholder="https://beispiel.de/bild.jpg">
                         </div>
+                        <div class="span-2" style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+                            <input type="checkbox" id="neuer-favorit" style="width: 20px; height: 20px;">
+                            <label for="neuer-favorit" style="margin: 0; cursor: pointer;">⭐ Als Favorit oben anzeigen</label>
+                        </div>
                     </div>
                     <div style="margin-top: 15px; display: flex; gap: 10px;">
                         <button class="btn-action btn-modal-save" onclick="speichereProdukt()">Produkt speichern</button>
@@ -1066,6 +1085,7 @@
                             <th>Produkt</th>
                             <th>Kat.</th>
                             <th>Preis</th>
+                            <th>Fav.</th>
                             <th style="text-align: right;">Aktion</th>
                         </tr>
                     </table>
@@ -1145,7 +1165,7 @@
         }
 
         if (!Array.isArray(gespeicherteProdukte)) {
-            return []; // Completely empty by default (0 initial products)
+            return [];
         }
         return gespeicherteProdukte;
     }
@@ -1163,13 +1183,17 @@
     }
 
     function renderProdukte() {
+        const gridFavoriten = document.getElementById('grid-favoriten');
+        const favoritenWrapper = document.getElementById('favoriten-container-wrapper');
         const gridGetraenke = document.getElementById('grid-getraenke');
         const gridVerzehr = document.getElementById('grid-verzehr');
         if (!gridGetraenke || !gridVerzehr) return;
 
+        gridFavoriten.innerHTML = '';
         gridGetraenke.innerHTML = '';
         gridVerzehr.innerHTML = '';
 
+        let hatFavoriten = false;
         let hatGetraenke = false;
         let hatVerzehr = false;
 
@@ -1185,13 +1209,23 @@
             }
 
             btn.onclick = () => fuegeZumWarenkorbHinzu(p);
+            
+            let sternHtml = p.favorit ? '<span class="stern-badge">⭐</span>' : '';
             btn.innerHTML = `
+                ${sternHtml}
                 <div class="btn-produkt-content">
                     <span class="produkt-title">${p.name}</span>
                     <span class="produkt-preis-badge">${p.preis.toFixed(2)} €</span>
                 </div>
             `;
             wrapper.appendChild(btn);
+
+            if (p.favorit) {
+                const favWrapper = wrapper.cloneNode(true);
+                favWrapper.querySelector('button').onclick = () => fuegeZumWarenkorbHinzu(p);
+                gridFavoriten.appendChild(favWrapper);
+                hatFavoriten = true;
+            }
 
             if (p.kategorie === 'getraenke') {
                 gridGetraenke.appendChild(wrapper);
@@ -1201,6 +1235,12 @@
                 hatVerzehr = true;
             }
         });
+
+        if (hatFavoriten) {
+            favoritenWrapper.style.display = 'block';
+        } else {
+            favoritenWrapper.style.display = 'none';
+        }
 
         if (!hatGetraenke) {
             gridGetraenke.innerHTML = '<div style="grid-column: span 4; color: var(--text-muted); font-size: 13px; padding: 10px 0;">Keine Getränke vorhanden. Bitte im Inhaber-Bereich unter „🔒 Inhaber-Bereich“ ➔ „🍕 Produkte“ anlegen.</div>';
@@ -1632,6 +1672,7 @@
         const kategorie = document.getElementById('neue-kategorie').value;
         const farbe = document.getElementById('neue-farbe').value;
         const bild = document.getElementById('neues-bild').value.trim();
+        const favorit = document.getElementById('neuer-favorit').checked;
 
         if (!name || isNaN(preis)) {
             alert('Bitte Namen und Preis angeben.');
@@ -1640,9 +1681,9 @@
 
         if (id) {
             const p = produkte.find(item => item.id == id);
-            if (p) { p.name = name; p.preis = preis; p.einkauf = einkauf; p.kategorie = kategorie; p.farbe = farbe; p.bild = bild; }
+            if (p) { p.name = name; p.preis = preis; p.einkauf = einkauf; p.kategorie = kategorie; p.farbe = farbe; p.bild = bild; p.favorit = favorit; }
         } else {
-            produkte.push({ id: Date.now(), name, preis, einkauf, kategorie, farbe, bild });
+            produkte.push({ id: Date.now(), name, preis, einkauf, kategorie, farbe, bild, favorit });
         }
 
         localStorage.setItem('kasse_produkte', JSON.stringify(produkte));
@@ -1660,6 +1701,7 @@
             document.getElementById('neue-kategorie').value = p.kategorie;
             document.getElementById('neue-farbe').value = p.farbe || '#2563eb';
             document.getElementById('neues-bild').value = p.bild || '';
+            document.getElementById('neuer-favorit').checked = !!p.favorit;
             document.getElementById('btn-produkt-abbrechen').style.display = 'block';
         }
     }
@@ -1678,16 +1720,17 @@
         document.getElementById('neuer-preis').value = '';
         document.getElementById('neuer-einkaufspreis').value = '';
         document.getElementById('neues-bild').value = '';
+        document.getElementById('neuer-favorit').checked = false;
         document.getElementById('btn-produkt-abbrechen').style.display = 'none';
     }
 
     function renderProdukteVerwaltungTabelle() {
         const tab = document.getElementById('tabelle-produkte-verwaltung');
         if (!tab) return;
-        tab.innerHTML = `<tr><th>Produkt</th><th>Kat.</th><th>Preis</th><th style="text-align: right;">Aktion</th></tr>`;
+        tab.innerHTML = `<tr><th>Produkt</th><th>Kat.</th><th>Preis</th><th>Fav.</th><th style="text-align: right;">Aktion</th></tr>`;
         
         if (produkte.length === 0) {
-            tab.innerHTML += `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 15px;">Keine Produkte vorhanden.</td></tr>`;
+            tab.innerHTML += `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 15px;">Keine Produkte vorhanden.</td></tr>`;
             return;
         }
 
@@ -1697,6 +1740,7 @@
                     <td>${p.name}</td>
                     <td>${p.kategorie}</td>
                     <td>${p.preis.toFixed(2)} €</td>
+                    <td>${p.favorit ? '⭐' : '-'}</td>
                     <td style="text-align: right;">
                         <button class="btn-tabelle-aktion btn-tabelle-edit" onclick="bearbeiteProdukt(${p.id})">Bearb.</button>
                         <button class="btn-tabelle-aktion btn-tabelle-del" onclick="loescheProdukt(${p.id})">Löschen</button>
