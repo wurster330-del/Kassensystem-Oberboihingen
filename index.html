@@ -197,7 +197,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             flex-wrap: wrap;
         }
 
@@ -233,9 +233,25 @@
         .btn-schein:hover { background: #f1f5f9; border-color: #94a3b8; }
 
         .rueckgeld-anzeige {
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 20px;
+            font-weight: 800;
             color: var(--warning);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #ffffff;
+            border: 2px solid #fde68a;
+            padding: 12px 16px;
+            border-radius: 10px;
+        }
+
+        .rueckgeld-wert-gross {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--warning);
+            letter-spacing: -0.5px;
         }
 
         .storno-gruppe {
@@ -303,21 +319,60 @@
         .btn-drucken {
             background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
             color: white;
-            margin-top: 6px;
-            padding: 16px;
+            padding: 18px 16px;
             font-size: 16px;
             font-weight: 800;
             box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
             border-radius: 10px;
+            flex: 0 0 240px;
+            max-width: 100%;
+        }
+
+        @media (max-width: 640px) {
+            .btn-drucken {
+                flex: 1 1 100%;
+            }
         }
 
         .btn-inhaber {
             background-color: #334155;
             color: white;
-            margin-top: 10px;
             border-radius: 10px;
-            padding: 12px;
+            padding: 16px;
             font-size: 14px;
+            flex: 1;
+        }
+
+        .unterer-haupt-container {
+            display: flex;
+            gap: 16px;
+            align-items: stretch;
+            margin-top: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .unterer-haupt-container {
+                flex-direction: column;
+            }
+        }
+
+        .gutschein-schmal-box {
+            flex: 1;
+            background: #f0fdf4;
+            border: 1px solid #dcfce7;
+            padding: 14px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .aktionen-rechts-box {
+            flex: 1.5;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: space-between;
         }
 
         .bon-container {
@@ -699,7 +754,6 @@
     <div class="kasse-panel">
         <div class="produkte-header">
             <h2>Produkte</h2>
-            <button class="btn-schein" style="background:#f8fafc; font-size:12px; padding:6px 10px;" onclick="erzwingeStandardProdukteReset()">🔄 Standard-Produkte wiederherstellen</button>
         </div>
 
         <div class="kategorie-titel">🍺 Getränke</div>
@@ -707,15 +761,6 @@
 
         <div class="kategorie-titel">🍔 Verzehr</div>
         <div class="grid" id="grid-verzehr"></div>
-
-        <div class="zahlungs-bereich" style="background: #f0fdf4; border-color: #dcfce7;">
-            <label style="margin-bottom: 8px; display: block;"><strong>Gutscheine & Bons:</strong></label>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
-                <button class="btn-schein" style="flex: 1; min-width: 90px; background: #0284c7; color: white; font-weight: 700; border: none;" onclick="druckeDirektWertgutschein(10)">🎟️ 10 € Gutschein</button>
-                <button class="btn-schein" style="flex: 1; min-width: 90px; background: #0284c7; color: white; font-weight: 700; border: none;" onclick="druckeDirektWertgutschein(15)">🎟️ 15 € Gutschein</button>
-                <button class="btn-schein" style="flex: 1; min-width: 90px; background: #0284c7; color: white; font-weight: 700; border: none;" onclick="druckeDirektWertgutschein(20)">🎟️ 20 € Gutschein</button>
-            </div>
-        </div>
 
         <div class="zahlungs-bereich">
             <div class="zahlungs-zeile">
@@ -730,7 +775,8 @@
                 </div>
             </div>
             <div class="rueckgeld-anzeige">
-                Rückgeld: <span id="rueckgeld-text">0,00</span> €
+                <span>Rückgeld: <span id="rueckgeld-text" class="rueckgeld-wert-gross">0,00</span> €</span>
+                <button class="btn-action btn-drucken" onclick="bonDrucken()">🖨️ Bon Drucken & Abrechnen</button>
             </div>
         </div>
 
@@ -746,8 +792,20 @@
             </button>
         </div>
         
-        <button class="btn-action btn-drucken" onclick="bonDrucken()">🖨️ Bon Drucken & Abrechnen</button>
-        <button class="btn-action btn-inhaber" onclick="oefneInhaberBereich()">🔒 Inhaber-Bereich</button>
+        <div class="unterer-haupt-container">
+            <div class="gutschein-schmal-box">
+                <label style="margin-bottom: 6px; display: block; font-size: 13px;"><strong>Gutscheine:</strong></label>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <button class="btn-schein" style="width: 100%; background: #0284c7; color: white; font-weight: 700; border: none; padding: 7px 10px; text-align: left; font-size: 13px;" onclick="druckeDirektWertgutschein(10)">🎟️ 10 € Bon</button>
+                    <button class="btn-schein" style="width: 100%; background: #0284c7; color: white; font-weight: 700; border: none; padding: 7px 10px; text-align: left; font-size: 13px;" onclick="druckeDirektWertgutschein(15)">🎟️ 15 € Bon</button>
+                    <button class="btn-schein" style="width: 100%; background: #0284c7; color: white; font-weight: 700; border: none; padding: 7px 10px; text-align: left; font-size: 13px;" onclick="druckeDirektWertgutschein(20)">🎟️ 20 € Bon</button>
+                </div>
+            </div>
+
+            <div class="aktionen-rechts-box" style="justify-content: flex-end;">
+                <button class="btn-action btn-inhaber" onclick="oefneInhaberBereich()">🔒 Inhaber-Bereich</button>
+            </div>
+        </div>
     </div>
 
     <div class="bon-container">
@@ -802,7 +860,7 @@
                 <button class="tab-btn active" onclick="switchTab('tab-tagesabschluss', event)">📊 Tagesabschluss</button>
                 <button class="tab-btn" onclick="switchTab('tab-wertbons', event)">🎟️ Wertbons entwerten</button>
                 <button class="tab-btn" onclick="switchTab('tab-wertbon-config', event)">⚙️ Stückelung verwalten</button>
-                <button class="tab-btn" onclick="switchTab('tab-produkte', event)">🍕 Produkte</button>
+                <button class="tab-btn" onclick="switchTab('tab-produkte', event)" id="btn-tab-produkte">🍕 Produkte</button>
                 <button class="tab-btn" onclick="switchTab('tab-helfer', event)">👥 Helfer</button>
                 <button class="tab-btn" onclick="switchTab('tab-einstellungen', event)">⚙️ Einstellungen</button>
             </div>
@@ -922,11 +980,11 @@
                 </div>
             </div>
 
-            <!-- WERTBON-KONFIGURATION (3 Feste Felder für 10/15/20€) -->
+            <!-- WERTBON-KONFIGURATION -->
             <div id="tab-wertbon-config" class="tab-pane">
                 <div class="inhaber-section highlight-card">
                     <h4>⚙️ Standard-Stückelung für Verzehrbons</h4>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Legen Sie hier fest, aus welchen Einzelwerten (Stückelung) sich die jeweiligen Standard-Gutscheine (10€, 15€, 20€) standardmäßig zusammensetzen sollen (Werte getrennt durch Komma, z. B. <code>5, 3, 2</code>).</p>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Legen Sie hier fest, aus welchen Einzelwerten sich die jeweiligen Standard-Gutscheine (10€, 15€, 20€) standardmäßig zusammensetzen sollen (Werte getrennt durch Komma).</p>
                     
                     <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px;">
                         <div>
@@ -1056,27 +1114,6 @@
 </div>
 
 <script>
-    const STANDARD_PRODUKTE = [
-        { id: 1, name: '1/2 Bier', preis: 3.80, einkauf: 1.80, kategorie: 'getraenke', farbe: '#b45309', bild: '' },
-        { id: 2, name: 'Weizenbier', preis: 4.00, einkauf: 1.90, kategorie: 'getraenke', farbe: '#d97706', bild: '' },
-        { id: 3, name: '1/4 Schorle weiss (süß)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#ca8a04', bild: '' },
-        { id: 4, name: '1/4 Schorle rot (süß)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#991b1b', bild: '' },
-        { id: 5, name: '1/4 Schorle rose (süß)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#db2777', bild: '' },
-        { id: 6, name: '1/4 Schorle weiss (sauer)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#ca8a04', bild: '' },
-        { id: 7, name: '1/4 Schorle rot (sauer)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#991b1b', bild: '' },
-        { id: 8, name: '1/4 Schorle rose (sauer)', preis: 3.00, einkauf: 1.20, kategorie: 'getraenke', farbe: '#db2777', bild: '' },
-        { id: 9, name: '1/2 Schorle weiss (sauer)', preis: 4.50, einkauf: 2.00, kategorie: 'getraenke', farbe: '#ca8a04', bild: '' },
-        { id: 10, name: '1/2 Schorle rot (sauer)', preis: 4.50, einkauf: 2.00, kategorie: 'getraenke', farbe: '#991b1b', bild: '' },
-        { id: 11, name: '1/2 Schorle rose (sauer)', preis: 4.50, einkauf: 2.00, kategorie: 'getraenke', farbe: '#db2777', bild: '' },
-        { id: 12, name: 'Sprudel sauer/süß', preis: 2.00, einkauf: 0.80, kategorie: 'getraenke', farbe: '#2563eb', bild: '' },
-        { id: 13, name: 'Cola', preis: 2.50, einkauf: 1.00, kategorie: 'getraenke', farbe: '#dc2626', bild: '' },
-        { id: 14, name: 'Fanta', preis: 2.50, einkauf: 1.00, kategorie: 'getraenke', farbe: '#ea580c', bild: '' },
-        { id: 15, name: 'Kaffee', preis: 2.00, einkauf: 0.70, kategorie: 'getraenke', farbe: '#78350f', bild: '' },
-        { id: 16, name: 'Flasche Sekt', preis: 12.00, einkauf: 6.50, kategorie: 'getraenke', farbe: '#059669', bild: '' },
-        { id: 17, name: 'Currywurst', preis: 4.50, einkauf: 2.10, kategorie: 'verzehr', farbe: '#ca8a04', bild: '' },
-        { id: 18, name: 'Pommes frites', preis: 3.00, einkauf: 1.10, kategorie: 'verzehr', farbe: '#9333ea', bild: '' }
-    ];
-
     let produkte = ladeUndSynchronisiereProdukte();
     let helferListe = JSON.parse(localStorage.getItem('kasse_helfer')) || ['Max Mustermann', 'Erika Musterfrau', 'Hans Dampf'];
     let anfangsbestand = parseFloat(localStorage.getItem('kasse_anfangsbestand')) || 100.00;
@@ -1096,20 +1133,10 @@
             gespeicherteProdukte = [];
         }
 
-        if (!Array.isArray(gespeicherteProdukte) || gespeicherteProdukte.length === 0) {
-            localStorage.setItem('kasse_produkte', JSON.stringify(STANDARD_PRODUKTE));
-            return [...STANDARD_PRODUKTE];
+        if (!Array.isArray(gespeicherteProdukte)) {
+            return [];
         }
         return gespeicherteProdukte;
-    }
-
-    function erzwingeStandardProdukteReset() {
-        if (confirm('Möchten Sie alle Standard-Getränke und Verzehrprodukte frisch laden?')) {
-            localStorage.setItem('kasse_produkte', JSON.stringify(STANDARD_PRODUKTE));
-            produkte = [...STANDARD_PRODUKTE];
-            renderProdukte();
-            alert('Standard-Produkte wiederhergestellt!');
-        }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -1131,6 +1158,11 @@
 
         gridGetraenke.innerHTML = '';
         gridVerzehr.innerHTML = '';
+
+        if (produkte.length === 0) {
+            gridGetraenke.innerHTML = '<div style="grid-column: span 4; color: var(--text-muted); font-size: 13px; padding: 10px 0;">Noch keine Getränke angelegt. Öffnen Sie den Inhaber-Bereich unter „🔒 Inhaber-Bereich“, um Produkte hinzuzufügen.</div>';
+            gridVerzehr.innerHTML = '<div style="grid-column: span 2; color: var(--text-muted); font-size: 13px; padding: 10px 0;">Noch keine Verzehrprodukte angelegt.</div>';
+        }
 
         produkte.forEach(p => {
             const wrapper = document.createElement('div');
@@ -1239,7 +1271,6 @@
         bonDrucken();
     }
 
-    // --- DIREKTE WERTGUTSCHEIN ERSTELLUNG (10€, 15€, 20€) AUS DER KONFIGURATION ---
     function druckeDirektWertgutschein(zielWert) {
         let config = {};
         try {
@@ -1632,6 +1663,12 @@
         const tab = document.getElementById('tabelle-produkte-verwaltung');
         if (!tab) return;
         tab.innerHTML = `<tr><th>Produkt</th><th>Kat.</th><th>Preis</th><th style="text-align: right;">Aktion</th></tr>`;
+        
+        if (produkte.length === 0) {
+            tab.innerHTML += `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 15px;">Keine Produkte vorhanden.</td></tr>`;
+            return;
+        }
+
         produkte.forEach(p => {
             tab.innerHTML += `
                 <tr>
